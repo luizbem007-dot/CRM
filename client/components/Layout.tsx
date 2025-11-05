@@ -47,6 +47,7 @@ export default function Layout({
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("supabaseSession");
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
     navigate("/");
