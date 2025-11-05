@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -19,15 +19,25 @@ export default function Login() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, remember }),
+        body: JSON.stringify({ email, password }),
       });
-      if (!res.ok) throw new Error("Falha no login");
+
       const data = await res.json();
+      if (!res.ok) {
+        // Server provides meaningful messages: 401 invalid, 403 deactivated
+        setError(data?.message || "Usuário ou senha inválidos");
+        return;
+      }
+
+      // Save session locally
       localStorage.setItem("token", data.token);
       localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("userRole", data.user.role ?? "");
+
       navigate("/app");
     } catch (err: any) {
-      setError(err.message || "Erro no login");
+      console.error(err);
+      setError("Erro ao conectar com o servidor");
     } finally {
       setLoading(false);
     }
@@ -43,9 +53,7 @@ export default function Login() {
               <span className="h-6 w-6 rounded-full bg-primary shadow-[0_0_30px_hsl(var(--primary))]" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight">FIQON CRM</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Painel premium para agentes de IA
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Painel premium para agentes de IA</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -87,27 +95,17 @@ export default function Login() {
                 />
                 Lembrar login
               </label>
-              <button type="button" className="text-secondary hover:opacity-80">
-                Esqueci minha senha
-              </button>
             </div>
+
             {error && (
               <div className="text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-md p-2">
                 {error}
               </div>
             )}
-            <Button
-              disabled={loading}
-              className="w-full h-11 text-base font-semibold shadow-[0_0_30px_hsl(var(--primary)/0.35)]"
-            >
+
+            <Button disabled={loading} type="submit" className="w-full h-11 text-base font-semibold shadow-[0_0_30px_hsl(var(--primary)/0.35)]">
               {loading ? "Entrando..." : "Entrar"}
             </Button>
-            <div className="text-center text-sm text-muted-foreground">
-              Não tem conta?{" "}
-              <Link to="#" className="text-secondary hover:opacity-80">
-                Criar conta
-              </Link>
-            </div>
           </form>
         </div>
       </div>
