@@ -17,7 +17,6 @@ export default function Login() {
     setError(null);
     setLoading(true);
     try {
-      const { supabase } = await import("@/lib/supabase");
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         console.error("Supabase login error:", error);
