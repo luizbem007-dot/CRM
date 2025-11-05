@@ -90,7 +90,7 @@ export default function Layout({
             })}
           </nav>
           <div className="mt-auto p-3">
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/70">
+            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/70">
               <LogOut className="h-4 w-4" />
               Sair
             </button>
