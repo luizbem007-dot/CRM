@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import bcrypt from "bcryptjs";
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
