@@ -38,10 +38,20 @@ const tabs: { key: TabKey; label: string; icon: any }[] = [
 
 export default function Layout({
   userName = "Usuário",
+  userRole = "",
   active,
   onChange,
   children,
 }: LayoutProps) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userRole");
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0F0D] via-[#0C1411] to-[#0A0F0D] text-foreground">
       <div className="flex">
