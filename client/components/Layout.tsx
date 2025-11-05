@@ -116,9 +116,12 @@ export default function Layout({
               <Bell className="h-4 w-4 m-auto" />
               <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-primary" />
             </button>
-            <div className="h-10 px-3 rounded-xl border border-input bg-background/60 flex items-center gap-2">
+            <div className="h-10 px-3 rounded-xl border border-input bg-background/60 flex items-center gap-3">
               <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-secondary" />
-              <div className="text-sm font-medium">{userName}</div>
+              <div className="flex flex-col">
+                <div className="text-sm font-medium">{userName}</div>
+                {userRole && <div className="text-[11px] text-muted-foreground">{userRole}</div>}
+              </div>
             </div>
           </header>
 
