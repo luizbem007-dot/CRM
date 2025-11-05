@@ -106,7 +106,7 @@ export default function Dashboard() {
   };
 
   return (
-    <Layout userName={userName} active={activeTab} onChange={setActiveTab}>
+    <Layout userName={userName} userRole={userRole} active={activeTab} onChange={setActiveTab}>
       {activeTab === "conversas" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Contacts */}
