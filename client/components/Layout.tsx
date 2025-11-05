@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import {
   MessageSquare,
@@ -10,6 +11,7 @@ import {
   Search,
   Bell,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export type TabKey =
   | "conversas"
@@ -20,6 +22,7 @@ export type TabKey =
 
 interface LayoutProps {
   userName?: string;
+  userRole?: string;
   active: TabKey;
   onChange: (tab: TabKey) => void;
   children: ReactNode;
