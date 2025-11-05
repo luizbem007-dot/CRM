@@ -1,8 +1,22 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { MessageSquare, Users, BarChart3, Settings, PlugZap, LogOut, Search, Bell } from "lucide-react";
+import {
+  MessageSquare,
+  Users,
+  BarChart3,
+  Settings,
+  PlugZap,
+  LogOut,
+  Search,
+  Bell,
+} from "lucide-react";
 
-export type TabKey = "conversas" | "contatos" | "relatorios" | "configuracoes" | "integracoes";
+export type TabKey =
+  | "conversas"
+  | "contatos"
+  | "relatorios"
+  | "configuracoes"
+  | "integracoes";
 
 interface LayoutProps {
   userName?: string;
@@ -19,7 +33,12 @@ const tabs: { key: TabKey; label: string; icon: any }[] = [
   { key: "integracoes", label: "Integrações", icon: PlugZap },
 ];
 
-export default function Layout({ userName = "Usuário", active, onChange, children }: LayoutProps) {
+export default function Layout({
+  userName = "Usuário",
+  active,
+  onChange,
+  children,
+}: LayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0F0D] via-[#0C1411] to-[#0A0F0D] text-foreground">
       <div className="flex">
@@ -49,7 +68,9 @@ export default function Layout({ userName = "Usuário", active, onChange, childr
                   <Icon className={cn("h-4 w-4", isActive && "text-primary")} />
                   <span className="flex-1 text-left">{label}</span>
                   {key === "conversas" && (
-                    <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">3</span>
+                    <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">
+                      3
+                    </span>
                   )}
                 </button>
               );
@@ -60,7 +81,9 @@ export default function Layout({ userName = "Usuário", active, onChange, childr
               <LogOut className="h-4 w-4" />
               Sair
             </button>
-            <div className="mt-3 text-[11px] text-muted-foreground/80 px-3">© {new Date().getFullYear()} FIQON</div>
+            <div className="mt-3 text-[11px] text-muted-foreground/80 px-3">
+              © {new Date().getFullYear()} FIQON
+            </div>
           </div>
         </aside>
 

@@ -43,7 +43,9 @@ export default function Login() {
               <span className="h-6 w-6 rounded-full bg-primary shadow-[0_0_30px_hsl(var(--primary))]" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight">FIQON CRM</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Painel premium para agentes de IA</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Painel premium para agentes de IA
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -94,11 +96,17 @@ export default function Login() {
                 {error}
               </div>
             )}
-            <Button disabled={loading} className="w-full h-11 text-base font-semibold shadow-[0_0_30px_hsl(var(--primary)/0.35)]">
+            <Button
+              disabled={loading}
+              className="w-full h-11 text-base font-semibold shadow-[0_0_30px_hsl(var(--primary)/0.35)]"
+            >
               {loading ? "Entrando..." : "Entrar"}
             </Button>
             <div className="text-center text-sm text-muted-foreground">
-              Não tem conta? <Link to="#" className="text-secondary hover:opacity-80">Criar conta</Link>
+              Não tem conta?{" "}
+              <Link to="#" className="text-secondary hover:opacity-80">
+                Criar conta
+              </Link>
             </div>
           </form>
         </div>
