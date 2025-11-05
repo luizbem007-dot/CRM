@@ -16,23 +16,32 @@ export default function Login() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        // Server provides meaningful messages: 401 invalid, 403 deactivated
-        setError(data?.message || "Usuário ou senha inválidos");
+      const { supabase } = await import("@/lib/supabase");
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        console.error("Supabase login error:", error);
+        setError("Usuário ou senha incorretos.");
         return;
       }
 
-      // Save session locally
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("userName", data.user.name);
-      localStorage.setItem("userRole", data.user.role ?? "");
+      // Retrieve current session and persist it locally
+      const sessionRes = await supabase.auth.getSession();
+      if (sessionRes.error) {
+        console.warn("Erro ao obter sessão Supabase:", sessionRes.error);
+      }
+
+      const session = sessionRes.data?.session ?? data.session ?? null;
+      if (session) {
+        localStorage.setItem("supabaseSession", JSON.stringify(session));
+      }
+
+      // Get user metadata (display name/role) from user.user_metadata if available
+      const user = data.user ?? session?.user ?? null;
+      const userName = (user?.user_metadata as any)?.name ?? user?.email ?? "Agente";
+      const userRole = (user?.user_metadata as any)?.role ?? "";
+
+      localStorage.setItem("userName", userName);
+      localStorage.setItem("userRole", userRole);
 
       navigate("/app");
     } catch (err: any) {
