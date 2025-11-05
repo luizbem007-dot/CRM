@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const userName = localStorage.getItem("userName") || "Agente";
+  const userRole = localStorage.getItem("userRole") || "";
   const [activeTab, setActiveTab] = useState<TabKey>("conversas");
 
   // Mock data (to be wired to backend)
