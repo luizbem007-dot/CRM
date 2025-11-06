@@ -166,6 +166,7 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Poppins', Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
 
   :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
