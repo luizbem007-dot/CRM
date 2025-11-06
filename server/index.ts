@@ -23,14 +23,7 @@ export function createServer() {
   app.post("/api/auth/login", handleLogin);
 
   // Z-API webhook endpoint for incoming messages
-  // dynamically import route without using top-level await
-  import("./routes/zapi")
-    .then(({ handleZapiWebhook }) => {
-      app.post("/api/zapi/webhook", handleZapiWebhook);
-    })
-    .catch((e) => {
-      console.warn("Z-API webhook route not registered:", e);
-    });
+  app.post("/api/zapi/webhook", handleZapiWebhook);
 
   return app;
 }
