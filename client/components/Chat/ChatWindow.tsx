@@ -30,11 +30,18 @@ export default function ChatWindow({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-3 border-b border-border/60 bg-background/60 backdrop-blur rounded-t-xl">
-        <div className="font-medium">{contactName}</div>
-        <div className="text-xs text-muted-foreground mt-0.5">
-          {status || "online"}
+      <div className="px-4 py-3 border-b border-border/60 bg-background/60 backdrop-blur rounded-t-xl flex items-center justify-between gap-3">
+        <div>
+          <div className="font-medium">{contactName}</div>
+          <div className="text-xs text-muted-foreground mt-0.5">{status || "online"}</div>
         </div>
+        {typeof onSend === "function" && (
+          <div>
+            <Button size="sm" variant="outline" onClick={onSend}>
+              <Send className="h-3 w-3" /> Enviar
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-background/40 to-background/20">
