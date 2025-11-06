@@ -6,7 +6,7 @@ import { handleLogin } from "./routes/auth";
 import { handleZapiWebhook } from "./routes/zapi";
 import { handleCreateMessage } from "./routes/messages";
 import { handleTestZapi } from "./routes/test_zapi";
-import { handleGetConversations, handleToggleBot, handleAssign, handleRelease, handleSetStatus, handleUpdateTags } from "./routes/conversations";
+import { handleGetConversations, handleToggleBot, handleAssign, handleRelease, handleSetStatus, handleUpdateTags, handleGetOrCreateByPhone } from "./routes/conversations";
 import { handleCreateContact, handleEditContact, handleAddNote, handleGetNotes } from "./routes/contacts_notes";
 
 export function createServer() {
