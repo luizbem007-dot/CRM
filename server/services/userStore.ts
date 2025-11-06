@@ -33,7 +33,7 @@ export async function findUserByEmail(email: string): Promise<StoredUser | null>
   });
 
   if (!res.ok) {
-    const txt = await res.text();
+    const txt = await res.clone().text();
     throw new Error(`Airtable request failed: ${res.status} ${txt}`);
   }
 

@@ -52,7 +52,7 @@ export default function useFiqonMessages(pollInterval = 0) {
         signal: controller.signal,
       });
       if (!res.ok) {
-        const txt = await res.text();
+        const txt = await res.clone().text();
         throw new Error(`FIQON fetch failed: ${res.status} ${txt}`);
       }
       const data = await res.json();
