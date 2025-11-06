@@ -5,6 +5,7 @@ import ContactListItem from "@/components/Chat/ContactListItem";
 import { Button } from "@/components/ui/button";
 import { Paperclip, Smile, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
+import useFiqonMessages from "@/hooks/use-fiqon-messages";
 
 export default function Dashboard() {
   const userName = localStorage.getItem("userName") || "Agente";
