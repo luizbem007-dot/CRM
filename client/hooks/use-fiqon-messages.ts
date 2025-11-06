@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 export interface FiqonMessage {
   id: string;
   client_id?: string;
+  user_id?: string;
+  phone?: string;
   nome?: string;
   message?: string;
   created_at?: string;
