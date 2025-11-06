@@ -40,6 +40,15 @@ export default function ChatWindow({
   messages,
   contactName,
   status,
+  conversation,
+  onToggleBot,
+  onAssign,
+  onRelease,
+  onSaveContact,
+  onAddNote,
+  onUpdateTags,
+  onSetStatus,
+  onSend,
 }: ChatWindowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
