@@ -17,36 +17,30 @@ export default function Login() {
     setError(null);
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        console.error("Supabase login error:", error);
-        setError("Usuário ou senha incorretos.");
+      // Use server-side auth to avoid depending on Supabase client auth in the browser
+      const resp = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const body = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        console.error('Server login failed', resp.status, body);
+        setError(body.message || 'Usuário ou senha incorretos.');
         return;
       }
 
-      // Retrieve current session and persist it locally
-      const sessionRes = await supabase.auth.getSession();
-      if (sessionRes.error) {
-        console.warn("Erro ao obter sessão Supabase:", sessionRes.error);
-      }
+      const token = body.token;
+      const user = body.user ?? { name: email, role: '' };
+      if (token) localStorage.setItem('token', token);
+      localStorage.setItem('userName', user.name ?? email);
+      localStorage.setItem('userRole', user.role ?? '');
 
-      const session = sessionRes.data?.session ?? data.session ?? null;
-      if (session) {
-        localStorage.setItem("supabaseSession", JSON.stringify(session));
-      }
-
-      // Get user metadata (display name/role) from user.user_metadata if available
-      const user = data.user ?? session?.user ?? null;
-      const userName = (user?.user_metadata as any)?.name ?? user?.email ?? "Agente";
-      const userRole = (user?.user_metadata as any)?.role ?? "";
-
-      localStorage.setItem("userName", userName);
-      localStorage.setItem("userRole", userRole);
-
-      navigate("/app");
+      navigate('/app');
     } catch (err: any) {
       console.error(err);
-      setError("Erro ao conectar com o servidor");
+      setError('Erro ao conectar com o servidor');
     } finally {
       setLoading(false);
     }
