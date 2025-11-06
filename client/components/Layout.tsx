@@ -104,24 +104,40 @@ export default function Layout({
         {/* Main */}
         <div className="flex-1 min-w-0">
           {/* Topbar */}
-          <header className="h-16 sticky top-0 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-background/80 border-b border-border/60 flex items-center px-4 lg:px-6 gap-3">
-            <div className="md:hidden mr-1 text-lg font-bold">FIQON CRM</div>
-            <div className="flex items-center gap-2 rounded-xl bg-background/60 border border-input px-3 h-10 flex-1 max-w-xl">
+          <header className="h-16 sticky top-0 backdrop-blur bg-background/60 border-b border-border/60 flex items-center px-4 lg:px-6 gap-3 neon-glow">
+            <div className="flex items-center gap-4">
+              <div className="f-logo">F</div>
+              <div className="hidden sm:block">
+                <div className="text-lg font-bold">Funcionou.AI</div>
+                <div className="text-[11px] text-text-secondary">Painel</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 rounded-xl bg-background/60 border border-input px-3 h-10 flex-1 max-w-xl neon-glow">
               <Search className="h-4 w-4 text-muted-foreground" />
               <input
                 placeholder="Busca rápida"
                 className="bg-transparent outline-none text-sm flex-1"
               />
             </div>
-            <button className="relative h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70">
-              <Bell className="h-4 w-4 m-auto" />
-              <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-primary" />
-            </button>
-            <div className="h-10 px-3 rounded-xl border border-input bg-background/60 flex items-center gap-3">
-              <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-secondary" />
-              <div className="flex flex-col">
-                <div className="text-sm font-medium">{userName}</div>
-                {userRole && <div className="text-[11px] text-muted-foreground">{userRole}</div>}
+
+            <div className="flex items-center gap-3 ml-3">
+              <div className="h-10 px-3 rounded-xl border panel-border-neon bg-background/60 flex items-center gap-3">
+                <div className="text-[13px] status-online">🟢</div>
+                <div className="text-sm">API: <span className="text-text-secondary">Conectado</span></div>
+              </div>
+
+              <button className="relative h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70">
+                <Bell className="h-4 w-4 m-auto" />
+                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-primary" />
+              </button>
+
+              <div className="h-10 px-3 rounded-xl border border-input bg-background/60 flex items-center gap-3">
+                <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-secondary" />
+                <div className="flex flex-col">
+                  <div className="text-sm font-medium">{userName}</div>
+                  {userRole && <div className="text-[11px] text-muted-foreground">{userRole}</div>}
+                </div>
               </div>
             </div>
           </header>
