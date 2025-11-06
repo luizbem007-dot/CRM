@@ -14,8 +14,8 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [showSplash, setShowSplash] = useState(true);
-  useEffect(() => {
+  const [showSplash, setShowSplash] = React.useState(true);
+  React.useEffect(() => {
     const t = setTimeout(() => setShowSplash(false), 1800);
     return () => clearTimeout(t);
   }, []);
