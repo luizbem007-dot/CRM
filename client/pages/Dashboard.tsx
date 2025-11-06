@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Layout, { TabKey } from "@/components/Layout";
 import ChatWindow, { Message } from "@/components/Chat/ChatWindow";
-import SaveContactModal from "@/components/Chat/SaveContactModal";
+const SaveContactModal = React.lazy(() => import("@/components/Chat/SaveContactModal"));
 import ContactListItem from "@/components/Chat/ContactListItem";
 import { Button } from "@/components/ui/button";
 import { Paperclip, Smile, Send } from "lucide-react";
