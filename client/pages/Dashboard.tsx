@@ -73,7 +73,13 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fiqonMessages]);
 
-  const displayMessages = (selectedId && messagesByClient[selectedId]) || [];
+  const displayMessages = (selectedId && messagesByContact[selectedId])
+    ? messagesByContact[selectedId].slice().sort((a: any, b: any) => {
+        const ta = a.ts ? new Date(a.ts).getTime() : 0;
+        const tb = b.ts ? new Date(b.ts).getTime() : 0;
+        return ta - tb;
+      })
+    : [];
 
   const handleSend = async () => {
     if (!input.trim() || !selectedId) return;
@@ -82,6 +88,7 @@ export default function Dashboard() {
       await supabase.from("fiqon").insert([
         {
           client_id: selectedId,
+          phone: selectedId,
           message: input,
           status: "agent",
           nome: localStorage.getItem("userName") || "Agente",
