@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleLogin } from "./routes/auth";
+import { handleZapiWebhook } from "./routes/zapi";
 
 export function createServer() {
   const app = express();
