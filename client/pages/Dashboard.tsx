@@ -114,33 +114,20 @@ export default function Dashboard() {
         /* ignore */
       }
 
-      // 1) Send to external Z-API
-      const res = await fetch(ZAPI_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, message: text }),
-      });
-
-      if (!res.ok) {
-        let txt = "<sem corpo de resposta>";
-        try {
-          // Try reading the response body once. If it fails, fall back to a clone attempt.
-          txt = await res.text();
-        } catch (e) {
-          try {
-            txt = await res.clone().text();
-          } catch (e2) {
-            txt = `<erro lendo corpo da resposta: ${e2?.message ?? String(e2)}>`;
-          }
-        }
-        console.error("Z-API error:", res.status, txt);
+      // 1) Send to external Z-API via Requester
+      const zapiResult = await sendTextZapi(phone, text);
+      // store for audit/logging/UI
+      setResponseZAPI(zapiResult);
+      if (!zapiResult.ok) {
+        console.error("Z-API error:", zapiResult.status, zapiResult.bodyText);
         const { toast } = await import("sonner");
-        if (res.status === 400 || res.status === 401) {
+        if (zapiResult.status === 400 || zapiResult.status === 401) {
           toast.error("❌ Erro ao enviar mensagem. Verifique se o número está correto e o WhatsApp está conectado.");
-        } else if (res.status === 404) {
+        } else if (zapiResult.status === 404) {
           toast.error("⚠️ O número informado não possui WhatsApp ativo.");
         } else {
-          toast.error("Erro ao enviar mensagem");
+          // non-blocking: just notify and continue without inserting into Supabase
+          toast.error("Erro ao enviar mensagem (Z-API)");
         }
         setSending(false);
         return;
@@ -222,6 +209,7 @@ export default function Dashboard() {
                 status={(conversations.find((x) => x.id === selectedId)?.status) ?? ""
                 }
                 messages={displayMessages}
+                onSend={handleSend}
               />
               <div className="p-3 border-t border-border/60 flex items-center gap-2">
                 <button className="h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70">
