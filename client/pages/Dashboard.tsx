@@ -148,9 +148,14 @@ export default function Dashboard() {
       ]);
 
       if (insert.error) {
-        console.error("Supabase insert error:", insert.error);
+        try {
+          console.error("Supabase insert error:", JSON.stringify(insert.error, Object.getOwnPropertyNames(insert.error)));
+          console.error("Full insert response:", JSON.stringify(insert, null, 2));
+        } catch (e) {
+          console.error("Supabase insert error (non-serializable):", insert.error);
+        }
         const { toast } = await import("sonner");
-        toast.error("Erro ao enviar mensagem");
+        toast.error("Erro ao enviar mensagem (Supabase)");
         setSending(false);
         return;
       }
