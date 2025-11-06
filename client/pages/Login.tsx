@@ -58,11 +58,11 @@ export default function Login() {
         <div className="absolute -inset-0.5 bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-primary/40 via-purple-400/30 to-primary/40 blur-xl rounded-3xl" />
         <div className="relative rounded-3xl border border-border/60 bg-card/80 backdrop-blur-xl p-8 shadow-2xl">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center">
-              <span className="h-6 w-6 rounded-full bg-primary shadow-[0_0_30px_hsl(var(--primary))]" />
+            <div className="mx-auto mb-4 h-20 w-20 rounded-2xl bg-transparent flex items-center justify-center">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2F6dec44841bf641cc89eed145dcb1ffe6?format=webp&width=800" alt="Funcionou.AI" className="h-20 w-20 object-contain" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">FIQON CRM</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Painel premium para agentes de IA</p>
+            <h1 className="text-2xl font-bold tracking-tight">Funcionou.AI</h1>
+            <p className="mt-1 text-sm text-text-secondary">Painel premium para agentes de IA</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
