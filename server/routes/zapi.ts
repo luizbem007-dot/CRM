@@ -2,8 +2,10 @@ import { RequestHandler } from "express";
 import { createClient } from "@supabase/supabase-js";
 
 function getSupabase() {
-  const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
-  const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ?? "";
+  const FALLBACK_URL = "https://bwstynvthxuwaiyrgjoe.supabase.co";
+  const FALLBACK_KEY = process.env.SUPABASE_ANON_KEY ?? "";
+  const SUPABASE_URL = process.env.SUPABASE_URL ?? FALLBACK_URL;
+  const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ?? FALLBACK_KEY;
   if (!SUPABASE_URL || !SUPABASE_KEY)
     throw new Error("SUPABASE_URL or SUPABASE_ANON_KEY not configured");
   return createClient(SUPABASE_URL, SUPABASE_KEY);
