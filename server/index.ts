@@ -26,12 +26,7 @@ export function createServer() {
   // Z-API webhook endpoint for incoming messages
   app.post("/api/zapi/webhook", handleZapiWebhook);
   // server-side message insertion endpoint to avoid client-side supabase insert issues
-  try {
-    const { handleCreateMessage } = await import("./routes/messages");
-    app.post("/api/messages", handleCreateMessage);
-  } catch (e) {
-    console.warn("Messages route not registered:", e);
-  }
+  app.post("/api/messages", handleCreateMessage);
 
   return app;
 }
