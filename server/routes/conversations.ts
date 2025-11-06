@@ -1,9 +1,12 @@
 import { RequestHandler } from "express";
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
-const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE ?? "";
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
+function getSupabase() {
+  const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
+  const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE ?? process.env.SUPABASE_ANON_KEY ?? "";
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) throw new Error("SUPABASE_URL or SUPABASE_SERVICE_ROLE not configured");
+  return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
+}
 
 export const handleToggleBot: RequestHandler = async (req, res) => {
   try {
@@ -11,6 +14,7 @@ export const handleToggleBot: RequestHandler = async (req, res) => {
     const { enabled } = req.body as { enabled?: boolean };
     if (typeof enabled !== "boolean") return res.status(400).json({ ok: false, error: 'enabled boolean required' });
 
+    const supabase = getSupabase();
     const update = await supabase.from('conversations').update({ bot_enabled: enabled }).eq('id', id).select();
     if (update.error) return res.status(500).json({ ok: false, error: update.error });
     return res.json({ ok: true, data: update.data });
@@ -26,6 +30,7 @@ export const handleAssign: RequestHandler = async (req, res) => {
     const { user } = req.body as { user?: string };
     if (!user) return res.status(400).json({ ok: false, error: 'user is required' });
 
+    const supabase = getSupabase();
     const update = await supabase.from('conversations').update({ assigned_to: user, assigned_at: new Date().toISOString() }).eq('id', id).select();
     if (update.error) return res.status(500).json({ ok: false, error: update.error });
     return res.json({ ok: true, data: update.data });
@@ -38,6 +43,7 @@ export const handleAssign: RequestHandler = async (req, res) => {
 export const handleRelease: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+    const supabase = getSupabase();
     const update = await supabase.from('conversations').update({ assigned_to: null, assigned_at: null }).eq('id', id).select();
     if (update.error) return res.status(500).json({ ok: false, error: update.error });
     return res.json({ ok: true, data: update.data });
@@ -52,6 +58,7 @@ export const handleSetStatus: RequestHandler = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body as { status?: string };
     if (!['open','pending','closed'].includes(status ?? '')) return res.status(400).json({ ok: false, error: 'invalid status' });
+    const supabase = getSupabase();
     const update = await supabase.from('conversations').update({ status }).eq('id', id).select();
     if (update.error) return res.status(500).json({ ok: false, error: update.error });
     return res.json({ ok: true, data: update.data });
@@ -65,6 +72,7 @@ export const handleUpdateTags: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const { tags } = req.body as { tags?: string[] };
+    const supabase = getSupabase();
     const update = await supabase.from('conversations').update({ tags }).eq('id', id).select();
     if (update.error) return res.status(500).json({ ok: false, error: update.error });
     return res.json({ ok: true, data: update.data });
@@ -76,6 +84,7 @@ export const handleUpdateTags: RequestHandler = async (req, res) => {
 
 export const handleGetConversations: RequestHandler = async (_req, res) => {
   try {
+    const supabase = getSupabase();
     const q = await supabase.from('conversations').select('*').order('created_at', { ascending: false }).limit(200);
     if (q.error) return res.status(500).json({ ok: false, error: q.error });
     return res.json({ ok: true, data: q.data });
@@ -89,9 +98,11 @@ export const handleGetOrCreateByPhone: RequestHandler = async (req, res) => {
   try {
     const phone = req.params.phone;
     if (!phone) return res.status(400).json({ ok: false, error: 'phone required' });
+    const supabase = getSupabase();
     const q = await supabase.from('conversations').select('*').eq('phone', phone).limit(1);
     if (q.error) return res.status(500).json({ ok: false, error: q.error });
     if (q.data && q.data.length > 0) return res.json({ ok: true, data: q.data[0] });
+    const supabase = getSupabase();
     const ins = await supabase.from('conversations').insert({ phone, created_at: new Date().toISOString() }).select();
     if (ins.error) return res.status(500).json({ ok: false, error: ins.error });
     return res.json({ ok: true, data: ins.data[0] });
