@@ -84,3 +84,19 @@ export const handleGetConversations: RequestHandler = async (_req, res) => {
     return res.status(500).json({ ok: false, error: err?.message ?? String(err) });
   }
 };
+
+export const handleGetOrCreateByPhone: RequestHandler = async (req, res) => {
+  try {
+    const phone = req.params.phone;
+    if (!phone) return res.status(400).json({ ok: false, error: 'phone required' });
+    const q = await supabase.from('conversations').select('*').eq('phone', phone).limit(1);
+    if (q.error) return res.status(500).json({ ok: false, error: q.error });
+    if (q.data && q.data.length > 0) return res.json({ ok: true, data: q.data[0] });
+    const ins = await supabase.from('conversations').insert({ phone, created_at: new Date().toISOString() }).select();
+    if (ins.error) return res.status(500).json({ ok: false, error: ins.error });
+    return res.json({ ok: true, data: ins.data[0] });
+  } catch (err: any) {
+    console.error(err);
+    return res.status(500).json({ ok: false, error: err?.message ?? String(err) });
+  }
+};
