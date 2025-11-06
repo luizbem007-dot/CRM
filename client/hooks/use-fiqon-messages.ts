@@ -172,5 +172,18 @@ export default function useFiqonMessages(pollInterval = 0) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pollInterval]);
 
-  return { messages, loading, error, refetch: fetchMessages };
+  const appendLocalMessage = (m: Partial<FiqonMessage>) => {
+    const normalized = normalize(m);
+    setMessages((prev) => {
+      // avoid duplicate client_message_id
+      if (normalized.client_message_id && prev.some((p) => p.client_message_id === normalized.client_message_id)) {
+        return prev;
+      }
+      // avoid duplicate id
+      if (prev.find((p) => String(p.id) === String(normalized.id))) return prev;
+      return [...prev, normalized];
+    });
+  };
+
+  return { messages, loading, error, refetch: fetchMessages, appendLocalMessage };
 }
