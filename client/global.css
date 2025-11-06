@@ -95,8 +95,8 @@
   }
 
   .f-logo {
-    width: 36px; height: 36px; border-radius: 8px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; color:var(--black-base); background:linear-gradient(180deg,var(--neon-green),var(--neon-green-dark)); box-shadow:0 0 18px rgba(0,255,102,0.18);
-  }
+    width: 36px; height: 36px; border-radius: 8px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; color:var(--black-base); background: transparent; box-shadow: none; padding: 0;
+    }
 
   .watermark {
     position: fixed; right: 12px; bottom: 8px; color: rgba(255,255,255,0.06); font-size: 12px; pointer-events: none;
