@@ -28,7 +28,6 @@ export const handleZapiWebhook: RequestHandler = async (req, res) => {
         phone,
         message,
         name: name ?? "WhatsApp",
-        from_me: false,
         source: "Z-API-webhook",
         created_at,
       },
