@@ -119,18 +119,16 @@ export default function Dashboard() {
       // store for audit/logging/UI
       setResponseZAPI(zapiResult);
       if (!zapiResult.ok) {
-        console.error("Z-API error:", zapiResult.status, zapiResult.bodyText);
+        console.warn("Z-API returned error, but will still record message locally and in Supabase", zapiResult.status, zapiResult.bodyText);
         const { toast } = await import("sonner");
         if (zapiResult.status === 400 || zapiResult.status === 401) {
           toast.error("❌ Erro ao enviar mensagem. Verifique se o número está correto e o WhatsApp está conectado.");
         } else if (zapiResult.status === 404) {
           toast.error("⚠️ O número informado não possui WhatsApp ativo.");
         } else {
-          // non-blocking: just notify and continue without inserting into Supabase
           toast.error("Erro ao enviar mensagem (Z-API)");
         }
-        setSending(false);
-        return;
+        // DO NOT return: continue to insert message into Supabase so optimistic message is persisted
       }
 
       // 2) If Z-API succeeded, insert into Supabase so Realtime picks it up
