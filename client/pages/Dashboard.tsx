@@ -121,7 +121,7 @@ export default function Dashboard() {
             <ChatWindow
               contactName={activeContact.name}
               status={activeContact.status}
-              messages={messages[selectedId]}
+              messages={displayMessages}
             />
             <div className="p-3 border-t border-border/60 flex items-center gap-2">
               <button className="h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70">
