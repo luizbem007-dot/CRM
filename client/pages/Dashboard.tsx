@@ -243,7 +243,7 @@ export default function Dashboard() {
         try {
           bodyText = await resp.text();
         } catch (e) {
-          try { bodyText = await resp.clone().text(); } catch (e2) { bodyText = String(e2); }
+          bodyText = String(e);
         }
 
         if (!resp.ok) {
