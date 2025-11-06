@@ -144,7 +144,9 @@ export default function Layout({
             </div>
           </header>
 
-          <main className="p-4 lg:p-6">{children}</main>
+          <main className="p-4 lg:p-6">{children}
+            <div className="watermark">⚡ Funcionou.AI</div>
+          </main>
         </div>
       </div>
     </div>
