@@ -4,8 +4,10 @@ export interface ZapiResponse {
   bodyText: string;
 }
 
+const DEFAULT_ZAPI = "https://api.z-api.io/instances/3E97080A6033712B38C3922F34499783/token/0B33D7C0F338A98F82743FEE/send-text";
+
 export async function sendTextZapi(phone: string, message: string): Promise<ZapiResponse> {
-  const ZAPI_URL = "https://api.z-api.io/instances/3E97080A6033712B38C3922F34499783/token/0B33D7C0F338A98F82743FEE/send-text";
+  const ZAPI_URL = (import.meta.env as any).VITE_ZAPI_URL ?? DEFAULT_ZAPI;
   try {
     const res = await fetch(ZAPI_URL, {
       method: "POST",
@@ -20,7 +22,7 @@ export async function sendTextZapi(phone: string, message: string): Promise<Zapi
       try {
         bodyText = await res.clone().text();
       } catch (e2) {
-        bodyText = `<error reading response body: ${e2?.message ?? String(e2)}>"`;
+        bodyText = `<error reading response body: ${e2?.message ?? String(e2)}>`;
       }
     }
 
