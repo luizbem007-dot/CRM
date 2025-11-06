@@ -1,5 +1,4 @@
 import { RequestHandler } from "express";
-import fetch from "node-fetch";
 
 export const handleTestZapi: RequestHandler = async (req, res) => {
   try {
@@ -13,8 +12,9 @@ export const handleTestZapi: RequestHandler = async (req, res) => {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (CLIENT_TOKEN) headers["Client-Token"] = CLIENT_TOKEN;
 
-    const zres = await fetch(ZAPI_URL, { method: "POST", headers, body: JSON.stringify({ phone, message }) });
-    const bodyText = await zres.text().catch((e) => `<error reading body: ${e?.message ?? e}>`);
+    // Use global fetch available in Node 18+
+    const zres = await (globalThis as any).fetch(ZAPI_URL, { method: "POST", headers, body: JSON.stringify({ phone, message }) });
+    const bodyText = await zres.text().catch((e: any) => `<error reading body: ${e?.message ?? e}>`);
 
     return res.status(200).json({ ok: true, status: zres.status, body: bodyText });
   } catch (err: any) {
