@@ -28,18 +28,29 @@ export default function Dashboard() {
     messagesByContact[key].push({ id: String(m.id), sender: sender as any, text: m.message ?? "", time });
   });
 
-  // Build conversations list from messages
-  const conversations = Object.keys(messagesByClient).map((clientId) => {
-    const list = messagesByClient[clientId];
-    const last = list[list.length - 1];
+  // Build conversations list from messagesByContact
+  const conversations = Object.keys(messagesByContact).map((contactKey) => {
+    const list = messagesByContact[contactKey];
+    // sort list by created_at ascending — but we only have time string; use original fiqonMessages to get timestamps
+    const msgs = list.slice();
+    const last = msgs[msgs.length - 1];
+    // find name from fiqonMessages for this contact
+    const meta = fiqonMessages.find((m) => String(m.phone ?? m.user_id ?? m.client_id ?? m.id) === contactKey);
+    const name = meta?.nome ?? `Cliente ${contactKey}`;
     return {
-      id: clientId,
-      name: last?.text ? (list[0]?.text ? list[0]?.text : `Cliente ${clientId}`) : `Cliente ${clientId}`,
+      id: contactKey,
+      name,
       lastMessage: last?.text ?? "",
       time: last?.time ?? "",
       unread: 0,
       status: last?.sender === "bot" ? "bot ativo" : "online",
-    };
+      lastTimestamp: meta?.created_at ?? null,
+    } as any;
+  }).sort((a: any, b: any) => {
+    // sort by lastTimestamp desc
+    const ta = a.lastTimestamp ? new Date(a.lastTimestamp).getTime() : 0;
+    const tb = b.lastTimestamp ? new Date(b.lastTimestamp).getTime() : 0;
+    return tb - ta;
   });
 
   // Ensure selectedId defaults to first conversation
