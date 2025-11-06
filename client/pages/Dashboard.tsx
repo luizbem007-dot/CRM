@@ -228,7 +228,7 @@ export default function Dashboard() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
                 />
-                <Button onClick={handleSend} className="h-11 px-4"><Send className="h-4 w-4" /> Enviar</Button>
+                <Button onClick={handleSend} disabled={sending} className="h-11 px-4"><Send className="h-4 w-4" /> Enviar</Button>
               </div>
             </div>
           </div>
