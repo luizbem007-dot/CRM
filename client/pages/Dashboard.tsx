@@ -45,63 +45,45 @@ export default function Dashboard() {
   const [selectedId, setSelectedId] = useState("1");
   const [input, setInput] = useState("");
 
-  const messages: Record<string, Message[]> = {
+  const mockMessages: Record<string, Message[]> = {
     "1": [
-      {
-        id: "m1",
-        sender: "bot",
-        text: "Olá Maria! Posso ajudar?",
-        time: "09:20",
-      },
-      {
-        id: "m2",
-        sender: "user",
-        text: "Quero saber sobre horários.",
-        time: "09:22",
-      },
-      {
-        id: "m3",
-        sender: "agent",
-        text: "Temos às 15h e 17h hoje.",
-        time: "09:23",
-      },
+      { id: "m1", sender: "bot", text: "Olá Maria! Posso ajudar?", time: "09:20" },
+      { id: "m2", sender: "user", text: "Quero saber sobre horários.", time: "09:22" },
+      { id: "m3", sender: "agent", text: "Temos às 15h e 17h hoje.", time: "09:23" },
       { id: "m4", sender: "user", text: "Obrigada!", time: "09:24" },
     ],
     "2": [
       { id: "m1", sender: "user", text: "Podemos reagendar?", time: "21:00" },
-      {
-        id: "m2",
-        sender: "bot",
-        text: "Claro! Para quando deseja?",
-        time: "21:01",
-      },
+      { id: "m2", sender: "bot", text: "Claro! Para quando deseja?", time: "21:01" },
     ],
     "3": [
-      {
-        id: "m1",
-        sender: "bot",
-        text: "Seu agendamento foi confirmado para 10:00.",
-        time: "08:10",
-      },
+      { id: "m1", sender: "bot", text: "Seu agendamento foi confirmado para 10:00.", time: "08:10" },
     ],
   };
 
   const activeContact = contacts.find((c) => c.id === selectedId)!;
 
+  // FIQON data source (poll every 2s)
+  const { messages: fiqonMessages } = useFiqonMessages(2000);
+
+  const messagesByClient: Record<string, Message[]> = {};
+  fiqonMessages.forEach((m) => {
+    const clientId = String(m.client_id ?? m.id ?? "");
+    if (!messagesByClient[clientId]) messagesByClient[clientId] = [];
+    const sender = (m.status || "").toLowerCase().includes("bot") || (m.message || "").startsWith("Bot:") ? "bot" : "user";
+    const time = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+    messagesByClient[clientId].push({ id: String(m.id), sender: sender as any, text: m.message ?? "", time });
+  });
+
+  const displayMessages = messagesByClient[selectedId] ?? mockMessages[selectedId] ?? [];
+
   const handleSend = async () => {
     if (!input.trim()) return;
-    // Would call /api/messages/send here
-    messages[selectedId] = [
-      ...messages[selectedId],
-      {
-        id: crypto.randomUUID(),
-        sender: "user",
-        text: input,
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      },
+    // Would call /api/messages/send or Supabase insert here
+    // For now append to local mock (won't persist to Supabase)
+    mockMessages[selectedId] = [
+      ...(mockMessages[selectedId] || []),
+      { id: crypto.randomUUID(), sender: "user", text: input, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) },
     ];
     setInput("");
   };
