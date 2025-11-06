@@ -4,6 +4,7 @@ import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleLogin } from "./routes/auth";
 import { handleZapiWebhook } from "./routes/zapi";
+import { handleCreateMessage } from "./routes/messages";
 
 export function createServer() {
   const app = express();
