@@ -27,7 +27,7 @@ const App = () => {
         <Sonner />
         {showSplash && (
           <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
-            <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2F6dec44841bf641cc89eed145dcb1ffe6?format=webp&width=800" alt="Funcionou.AI" className="h-40 w-40 animate-fade-in" />
+            <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2Ff4f6d8a8cede428fa0c26b651908a2f8?format=webp&width=800" alt="Funcionou.AI" className="h-40 w-40 animate-fade-in" />
           </div>
         )}
         <BrowserRouter>
