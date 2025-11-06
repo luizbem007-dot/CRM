@@ -30,13 +30,20 @@ export default function Dashboard() {
 
   // Build conversations list from messagesByContact
   const conversations = Object.keys(messagesByContact).map((contactKey) => {
-    const list = messagesByContact[contactKey];
-    // sort list by created_at ascending — but we only have time string; use original fiqonMessages to get timestamps
-    const msgs = list.slice();
-    const last = msgs[msgs.length - 1];
+    const list = messagesByContact[contactKey].slice();
+    // sort messages by ts ascending
+    list.sort((a: any, b: any) => {
+      const ta = a.ts ? new Date(a.ts).getTime() : 0;
+      const tb = b.ts ? new Date(b.ts).getTime() : 0;
+      return ta - tb;
+    });
+    const last = list[list.length - 1];
+
     // find name from fiqonMessages for this contact
     const meta = fiqonMessages.find((m) => String(m.phone ?? m.user_id ?? m.client_id ?? m.id) === contactKey);
     const name = meta?.nome ?? `Cliente ${contactKey}`;
+    const lastTimestamp = last?.ts ?? meta?.created_at ?? null;
+
     return {
       id: contactKey,
       name,
@@ -44,7 +51,8 @@ export default function Dashboard() {
       time: last?.time ?? "",
       unread: 0,
       status: last?.sender === "bot" ? "bot ativo" : "online",
-      lastTimestamp: meta?.created_at ?? null,
+      lastTimestamp,
+      messages: list,
     } as any;
   }).sort((a: any, b: any) => {
     // sort by lastTimestamp desc
