@@ -93,6 +93,26 @@ export default function Dashboard() {
     const ZAPI_URL = "https://api.z-api.io/instances/3E97080A6033712B38C3922F34499783/token/0B33D7C0F338A98F82743FEE/send-text";
 
     try {
+      setSending(true);
+      // create a client_message_id for deduplication
+      const client_message_id = crypto.randomUUID();
+      const optimistic = {
+        id: `local-${client_message_id}`,
+        client_message_id,
+        phone,
+        message: text,
+        fromMe: true,
+        name: localStorage.getItem("userName") || "Agente",
+        created_at: new Date().toISOString(),
+      } as any;
+
+      // append optimistic message immediately
+      try {
+        appendLocalMessage(optimistic);
+      } catch (e) {
+        /* ignore */
+      }
+
       // 1) Send to external Z-API
       const res = await fetch(ZAPI_URL, {
         method: "POST",
@@ -103,9 +123,15 @@ export default function Dashboard() {
       if (!res.ok) {
         const txt = await res.text();
         console.error("Z-API error:", res.status, txt);
-        // show toast error
         const { toast } = await import("sonner");
-        toast.error("Erro ao enviar mensagem");
+        if (res.status === 400 || res.status === 401) {
+          toast.error("❌ Erro ao enviar mensagem. Verifique se o número está correto e o WhatsApp está conectado.");
+        } else if (res.status === 404) {
+          toast.error("⚠️ O número informado não possui WhatsApp ativo.");
+        } else {
+          toast.error("Erro ao enviar mensagem");
+        }
+        setSending(false);
         return;
       }
 
@@ -113,10 +139,14 @@ export default function Dashboard() {
       const { supabase } = await import("@/lib/supabase");
       const insert = await supabase.from("fiqon").insert([
         {
-          fromMe: true,
+          client_message_id,
+          user_id: selectedId,
+          sender: "fromMe",
           message: text,
-          phone: phone,
           name: localStorage.getItem("userName") || "Agente",
+          phone: phone,
+          source: "CRM",
+          fromMe: true,
           created_at: new Date().toISOString(),
         },
       ]);
@@ -125,10 +155,11 @@ export default function Dashboard() {
         console.error("Supabase insert error:", insert.error);
         const { toast } = await import("sonner");
         toast.error("Erro ao enviar mensagem");
+        setSending(false);
         return;
       }
 
-      // Clear input. Realtime subscription will add the message to UI.
+      // Clear input. Realtime subscription will replace optimistic message with official row
       setInput("");
       const { toast } = await import("sonner");
       toast.success("Mensagem enviada");
@@ -136,6 +167,8 @@ export default function Dashboard() {
       console.error("Erro ao enviar mensagem:", err);
       const { toast } = await import("sonner");
       toast.error("Erro ao enviar mensagem");
+    } finally {
+      setSending(false);
     }
   };
 
