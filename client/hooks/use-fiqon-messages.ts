@@ -23,6 +23,8 @@ export default function useFiqonMessages(pollInterval = 0) {
   const normalize = (d: any): FiqonMessage => ({
     id: String(d.id ?? d.ID ?? d.pk ?? Math.random()),
     client_id: d.client_id ?? d.cliente_id ?? d.clientId ?? d.client ?? d.client_id,
+    user_id: d.user_id ?? d.userId ?? d.userid ?? d.user ?? undefined,
+    phone: d.phone ?? d.telefone ?? d.numero ?? d.msisdn ?? undefined,
     nome: d.nome ?? d.name ?? d.nome_cliente ?? d.client_name,
     message: d.message ?? d.mensagem ?? d.text ?? d.body,
     created_at: d.created_at ?? d.inserted_at ?? d.ts ?? d.created_at,
