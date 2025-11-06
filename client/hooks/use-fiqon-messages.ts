@@ -112,6 +112,14 @@ export default function useFiqonMessages(pollInterval = 0) {
               console.log("🔴 Nova mensagem recebida via Realtime", newRow);
               const normalized = normalize(newRow);
               setMessages((prev) => {
+                // If we have an optimistic message with same client_message_id, replace it
+                if (normalized.client_message_id) {
+                  const has = prev.some((p) => p.client_message_id && p.client_message_id === normalized.client_message_id);
+                  if (has) {
+                    return prev.map((p) => (p.client_message_id === normalized.client_message_id ? normalized : p));
+                  }
+                }
+                // avoid duplicate by id
                 if (prev.find((m) => String(m.id) === String(normalized.id))) return prev;
                 return [...prev, normalized];
               });
