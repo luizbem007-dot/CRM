@@ -17,7 +17,8 @@ export default function Dashboard() {
   const [input, setInput] = useState("");
 
   // FIQON data source (realtime via Supabase)
-  const { messages: fiqonMessages, loading: fiqonLoading } = useFiqonMessages(0);
+  const { messages: fiqonMessages, loading: fiqonLoading, appendLocalMessage } = useFiqonMessages(0);
+  const [sending, setSending] = useState(false);
 
   // Group messages by phone (preferred) or user_id or client_id
   const messagesByContact: Record<string, Message[]> = {};
