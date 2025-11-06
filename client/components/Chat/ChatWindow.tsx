@@ -10,11 +10,29 @@ export interface Message {
   time: string;
 }
 
+interface ConversationMeta {
+  id?: string;
+  phone?: string;
+  name?: string;
+  bot_enabled?: boolean;
+  assigned_to?: string | null;
+  tags?: string[];
+  status?: string;
+}
+
 interface ChatWindowProps {
   messages: Message[];
   contactName: string;
   status?: string;
   onSend?: () => void;
+  conversation?: ConversationMeta;
+  onToggleBot?: (enabled: boolean) => void;
+  onAssign?: () => void;
+  onRelease?: () => void;
+  onSaveContact?: () => void;
+  onAddNote?: () => void;
+  onUpdateTags?: (tags: string[]) => void;
+  onSetStatus?: (status: string) => void;
 }
 
 export default function ChatWindow({
