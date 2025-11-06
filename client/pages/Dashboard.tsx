@@ -18,14 +18,14 @@ export default function Dashboard() {
   // FIQON data source (realtime via Supabase)
   const { messages: fiqonMessages, loading: fiqonLoading } = useFiqonMessages(0);
 
-  // Group messages by client_id
-  const messagesByClient: Record<string, Message[]> = {};
+  // Group messages by phone (preferred) or user_id or client_id
+  const messagesByContact: Record<string, Message[]> = {};
   fiqonMessages.forEach((m) => {
-    const clientId = String(m.client_id ?? m.id ?? "unknown");
-    if (!messagesByClient[clientId]) messagesByClient[clientId] = [];
+    const key = String(m.phone ?? m.user_id ?? m.client_id ?? m.id ?? "unknown");
+    if (!messagesByContact[key]) messagesByContact[key] = [];
     const sender = (m.status || "").toLowerCase().includes("bot") || (m.message || "").startsWith("Bot:") ? "bot" : "user";
     const time = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
-    messagesByClient[clientId].push({ id: String(m.id), sender: sender as any, text: m.message ?? "", time });
+    messagesByContact[key].push({ id: String(m.id), sender: sender as any, text: m.message ?? "", time });
   });
 
   // Build conversations list from messages
