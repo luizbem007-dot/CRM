@@ -83,22 +83,57 @@ export default function Dashboard() {
 
   const handleSend = async () => {
     if (!input.trim() || !selectedId) return;
+
+    const phone = selectedId;
+    const text = input.trim();
+
+    // Z-API endpoint
+    const ZAPI_URL = "https://api.z-api.io/instances/3E97080A6033712B38C3922F34499783/token/0B33D7C0F338A98F82743FEE/send-text";
+
     try {
+      // 1) Send to external Z-API
+      const res = await fetch(ZAPI_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, message: text }),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        console.error("Z-API error:", res.status, txt);
+        // show toast error
+        const { toast } = await import("sonner");
+        toast.error("Erro ao enviar mensagem");
+        return;
+      }
+
+      // 2) If Z-API succeeded, insert into Supabase so Realtime picks it up
       const { supabase } = await import("@/lib/supabase");
-      await supabase.from("fiqon").insert([
+      const insert = await supabase.from("fiqon").insert([
         {
-          client_id: selectedId,
-          phone: selectedId,
-          message: input,
-          status: "agent",
-          nome: localStorage.getItem("userName") || "Agente",
+          fromMe: true,
+          message: text,
+          phone: phone,
+          name: localStorage.getItem("userName") || "Agente",
           created_at: new Date().toISOString(),
         },
       ]);
-      // Realtime will pick up the inserted row and update state
+
+      if (insert.error) {
+        console.error("Supabase insert error:", insert.error);
+        const { toast } = await import("sonner");
+        toast.error("Erro ao enviar mensagem");
+        return;
+      }
+
+      // Clear input. Realtime subscription will add the message to UI.
       setInput("");
+      const { toast } = await import("sonner");
+      toast.success("Mensagem enviada");
     } catch (err) {
       console.error("Erro ao enviar mensagem:", err);
+      const { toast } = await import("sonner");
+      toast.error("Erro ao enviar mensagem");
     }
   };
 
