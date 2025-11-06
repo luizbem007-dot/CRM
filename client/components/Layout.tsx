@@ -59,10 +59,10 @@ export default function Layout({
         {/* Sidebar */}
         <aside className="hidden md:flex md:w-64 lg:w-72 shrink-0 h-screen sticky top-0 flex-col border-r border-border/60 bg-sidebar shadow-inner">
           <div className="h-16 flex items-center gap-3 px-5 border-b border-border/60">
-            <div className="h-9 w-9 rounded-lg bg-primary/20 flex items-center justify-center">
-              <span className="h-3 w-3 rounded-full bg-primary shadow-[0_0_24px_hsl(var(--primary))]" />
+            <div className="h-9 w-9 rounded-lg bg-transparent flex items-center justify-center">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2Fa33e52d5d58c411c9ab9b2443c5520b9?format=webp&width=800" alt="Funcionou.AI" className="h-8 w-8 object-contain" />
             </div>
-            <div className="text-lg font-bold tracking-tight">FIQON CRM</div>
+            <div className="text-lg font-bold tracking-tight">Funcionou.AI</div>
           </div>
           <nav className="p-3 space-y-1">
             {tabs.map(({ key, label, icon: Icon }) => {
