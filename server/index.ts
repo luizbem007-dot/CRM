@@ -28,6 +28,7 @@ export function createServer() {
   app.post("/api/zapi/webhook", handleZapiWebhook);
   // server-side message insertion endpoint to avoid client-side supabase insert issues
   app.post("/api/messages", handleCreateMessage);
+  app.get("/api/test-zapi", handleTestZapi);
 
   return app;
 }
