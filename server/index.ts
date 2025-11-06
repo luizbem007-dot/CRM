@@ -34,6 +34,7 @@ export function createServer() {
 
   // Conversation management routes
   app.get('/api/conversations', handleGetConversations);
+  app.get('/api/conversations/by-phone/:phone', handleGetOrCreateByPhone);
   app.post('/api/conversations/:id/bot', handleToggleBot);
   app.post('/api/conversations/:id/assign', handleAssign);
   app.post('/api/conversations/:id/release', handleRelease);
