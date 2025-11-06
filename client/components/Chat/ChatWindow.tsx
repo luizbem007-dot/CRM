@@ -14,6 +14,7 @@ interface ChatWindowProps {
   messages: Message[];
   contactName: string;
   status?: string;
+  onSend?: () => void;
 }
 
 export default function ChatWindow({
