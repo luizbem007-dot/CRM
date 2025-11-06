@@ -132,43 +132,40 @@ export default function Dashboard() {
       }
 
       // 2) If Z-API succeeded, insert into Supabase so Realtime picks it up
-      const { supabase } = await import("@/lib/supabase");
-      let insert: any = null;
+      // Use server endpoint to create the message in Supabase to avoid client-side supabase-js insert issues
       try {
-        insert = await supabase.from("fiqon").insert([
-          {
+        const resp = await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
             client_message_id,
             user_id: selectedId,
-            sender: "fromMe",
+            phone,
             message: text,
-            name: localStorage.getItem("userName") || "Agente",
-            phone: phone,
-            source: "CRM",
+            name: localStorage.getItem('userName') || 'Agente',
+            source: 'CRM',
             fromMe: true,
-            created_at: new Date().toISOString(),
-          },
-        ]);
-      } catch (e: any) {
-        // supabase client may throw if response body was already read by internal code
-        console.error("Supabase insert threw an exception:", e?.message ?? e);
-        console.error(e);
-        const { toast } = await import("sonner");
-        toast.error("Erro ao enviar mensagem (Supabase)");
-        // do not abort the flow; keep optimistic message and clear input
-        setInput("");
-        setSending(false);
-        return;
-      }
+          }),
+        });
 
-      if (insert && insert.error) {
-        // Log safely without attempting to JSON.stringify internal Response objects
+        let bodyText = '';
         try {
-          console.error("Supabase insert error message:", insert.error.message ?? insert.error);
-        } catch (logErr) {
-          console.error("Supabase insert error (unserializable):", insert.error);
+          bodyText = await resp.text();
+        } catch (e) {
+          try { bodyText = await resp.clone().text(); } catch (e2) { bodyText = String(e2); }
         }
-        const { toast } = await import("sonner");
-        toast.error("Erro ao enviar mensagem (Supabase)");
+
+        if (!resp.ok) {
+          console.error('Server /api/messages returned error', resp.status, bodyText);
+          const { toast } = await import('sonner');
+          toast.error('Erro ao enviar mensagem (server)');
+          setSending(false);
+          return;
+        }
+      } catch (e) {
+        console.error('Error calling /api/messages:', e);
+        const { toast } = await import('sonner');
+        toast.error('Erro ao enviar mensagem (server)');
         setSending(false);
         return;
       }
