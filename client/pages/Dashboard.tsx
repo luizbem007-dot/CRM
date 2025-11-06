@@ -133,26 +133,39 @@ export default function Dashboard() {
 
       // 2) If Z-API succeeded, insert into Supabase so Realtime picks it up
       const { supabase } = await import("@/lib/supabase");
-      const insert = await supabase.from("fiqon").insert([
-        {
-          client_message_id,
-          user_id: selectedId,
-          sender: "fromMe",
-          message: text,
-          name: localStorage.getItem("userName") || "Agente",
-          phone: phone,
-          source: "CRM",
-          fromMe: true,
-          created_at: new Date().toISOString(),
-        },
-      ]);
+      let insert: any = null;
+      try {
+        insert = await supabase.from("fiqon").insert([
+          {
+            client_message_id,
+            user_id: selectedId,
+            sender: "fromMe",
+            message: text,
+            name: localStorage.getItem("userName") || "Agente",
+            phone: phone,
+            source: "CRM",
+            fromMe: true,
+            created_at: new Date().toISOString(),
+          },
+        ]);
+      } catch (e: any) {
+        // supabase client may throw if response body was already read by internal code
+        console.error("Supabase insert threw an exception:", e?.message ?? e);
+        console.error(e);
+        const { toast } = await import("sonner");
+        toast.error("Erro ao enviar mensagem (Supabase)");
+        // do not abort the flow; keep optimistic message and clear input
+        setInput("");
+        setSending(false);
+        return;
+      }
 
-      if (insert.error) {
+      if (insert && insert.error) {
+        // Log safely without attempting to JSON.stringify internal Response objects
         try {
-          console.error("Supabase insert error:", JSON.stringify(insert.error, Object.getOwnPropertyNames(insert.error)));
-          console.error("Full insert response:", JSON.stringify(insert, null, 2));
-        } catch (e) {
-          console.error("Supabase insert error (non-serializable):", insert.error);
+          console.error("Supabase insert error message:", insert.error.message ?? insert.error);
+        } catch (logErr) {
+          console.error("Supabase insert error (unserializable):", insert.error);
         }
         const { toast } = await import("sonner");
         toast.error("Erro ao enviar mensagem (Supabase)");
