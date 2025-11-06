@@ -54,7 +54,7 @@ export default function Layout({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A0F0D] via-[#0C1411] to-[#0A0F0D] text-foreground">
+    <div className="min-h-screen bg-black text-foreground">
       <div className="flex">
         {/* Sidebar */}
         <aside className="hidden md:flex md:w-64 lg:w-72 shrink-0 h-screen sticky top-0 flex-col border-r border-border/60 bg-sidebar shadow-inner">
