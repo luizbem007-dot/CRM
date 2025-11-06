@@ -25,7 +25,7 @@ export default function Dashboard() {
     if (!messagesByContact[key]) messagesByContact[key] = [];
     const sender = (m.status || "").toLowerCase().includes("bot") || (m.message || "").startsWith("Bot:") ? "bot" : "user";
     const time = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
-    messagesByContact[key].push({ id: String(m.id), sender: sender as any, text: m.message ?? "", time, ts: m.created_at });
+    messagesByContact[key].push({ id: String(m.id), sender: sender as any, text: m.message ?? "", time, ts: m.created_at } as any);
   });
 
   // Build conversations list from messagesByContact
