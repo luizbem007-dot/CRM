@@ -311,6 +311,14 @@ export default function Dashboard() {
                 }
                 messages={displayMessages}
                 onSend={handleSend}
+                conversation={conversationMeta}
+                onToggleBot={toggleBot}
+                onAssign={assignConversation}
+                onRelease={releaseConversation}
+                onSaveContact={saveContact}
+                onAddNote={addNote}
+                onUpdateTags={updateTags}
+                onSetStatus={setStatus}
               />
               <div className="p-3 border-t border-border/60 flex items-center gap-2">
                 <button className="h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70">
