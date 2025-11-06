@@ -120,7 +120,17 @@ export default function Dashboard() {
       });
 
       if (!res.ok) {
-        const txt = await res.clone().text();
+        let txt = "<sem corpo de resposta>";
+        try {
+          // Try reading the response body once. If it fails, fall back to a clone attempt.
+          txt = await res.text();
+        } catch (e) {
+          try {
+            txt = await res.clone().text();
+          } catch (e2) {
+            txt = `<erro lendo corpo da resposta: ${e2?.message ?? String(e2)}>`;
+          }
+        }
         console.error("Z-API error:", res.status, txt);
         const { toast } = await import("sonner");
         if (res.status === 400 || res.status === 401) {
