@@ -12,80 +12,68 @@ export default function Dashboard() {
   const userRole = localStorage.getItem("userRole") || "";
   const [activeTab, setActiveTab] = useState<TabKey>("conversas");
 
-  // Mock data (to be wired to backend)
-  const contacts = useMemo(
-    () => [
-      {
-        id: "1",
-        name: "Maria Silva",
-        lastMessage: "Obrigada!",
-        time: "09:24",
-        unread: 2,
-        status: "online",
-      },
-      {
-        id: "2",
-        name: "João Pedro",
-        lastMessage: "Podemos reagendar?",
-        time: "Ontem",
-        unread: 0,
-        status: "último visto 21:02",
-      },
-      {
-        id: "3",
-        name: "Clínica Viva",
-        lastMessage: "Bot: seu agendamento foi confirmado.",
-        time: "Seg",
-        unread: 0,
-        status: "bot ativo",
-      },
-    ],
-    [],
-  );
-  const [selectedId, setSelectedId] = useState("1");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [input, setInput] = useState("");
 
-  const mockMessages: Record<string, Message[]> = {
-    "1": [
-      { id: "m1", sender: "bot", text: "Olá Maria! Posso ajudar?", time: "09:20" },
-      { id: "m2", sender: "user", text: "Quero saber sobre horários.", time: "09:22" },
-      { id: "m3", sender: "agent", text: "Temos às 15h e 17h hoje.", time: "09:23" },
-      { id: "m4", sender: "user", text: "Obrigada!", time: "09:24" },
-    ],
-    "2": [
-      { id: "m1", sender: "user", text: "Podemos reagendar?", time: "21:00" },
-      { id: "m2", sender: "bot", text: "Claro! Para quando deseja?", time: "21:01" },
-    ],
-    "3": [
-      { id: "m1", sender: "bot", text: "Seu agendamento foi confirmado para 10:00.", time: "08:10" },
-    ],
-  };
-
-  const activeContact = contacts.find((c) => c.id === selectedId)!;
-
   // FIQON data source (realtime via Supabase)
-  const { messages: fiqonMessages } = useFiqonMessages(0);
+  const { messages: fiqonMessages, loading: fiqonLoading } = useFiqonMessages(0);
 
+  // Group messages by client_id
   const messagesByClient: Record<string, Message[]> = {};
   fiqonMessages.forEach((m) => {
-    const clientId = String(m.client_id ?? m.id ?? "");
+    const clientId = String(m.client_id ?? m.id ?? "unknown");
     if (!messagesByClient[clientId]) messagesByClient[clientId] = [];
     const sender = (m.status || "").toLowerCase().includes("bot") || (m.message || "").startsWith("Bot:") ? "bot" : "user";
     const time = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
     messagesByClient[clientId].push({ id: String(m.id), sender: sender as any, text: m.message ?? "", time });
   });
 
-  const displayMessages = messagesByClient[selectedId] ?? mockMessages[selectedId] ?? [];
+  // Build conversations list from messages
+  const conversations = Object.keys(messagesByClient).map((clientId) => {
+    const list = messagesByClient[clientId];
+    const last = list[list.length - 1];
+    return {
+      id: clientId,
+      name: last?.text ? (list[0]?.text ? list[0]?.text : `Cliente ${clientId}`) : `Cliente ${clientId}`,
+      lastMessage: last?.text ?? "",
+      time: last?.time ?? "",
+      unread: 0,
+      status: last?.sender === "bot" ? "bot ativo" : "online",
+    };
+  });
+
+  // Ensure selectedId defaults to first conversation
+  useEffect(() => {
+    if (!selectedId && conversations.length > 0) {
+      setSelectedId(conversations[0].id);
+    }
+    // if selectedId exists but not in conversations, reset
+    if (selectedId && !conversations.find((c) => c.id === selectedId)) {
+      setSelectedId(conversations[0]?.id ?? null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fiqonMessages]);
+
+  const displayMessages = (selectedId && messagesByClient[selectedId]) || [];
 
   const handleSend = async () => {
-    if (!input.trim()) return;
-    // Would call /api/messages/send or Supabase insert here
-    // For now append to local mock (won't persist to Supabase)
-    mockMessages[selectedId] = [
-      ...(mockMessages[selectedId] || []),
-      { id: crypto.randomUUID(), sender: "user", text: input, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) },
-    ];
-    setInput("");
+    if (!input.trim() || !selectedId) return;
+    try {
+      const { supabase } = await import("@/lib/supabase");
+      await supabase.from("fiqon").insert([
+        {
+          client_id: selectedId,
+          message: input,
+          status: "agent",
+          nome: localStorage.getItem("userName") || "Agente",
+          created_at: new Date().toISOString(),
+        },
+      ]);
+      // Realtime will pick up the inserted row and update state
+      setInput("");
+    } catch (err) {
+      console.error("Erro ao enviar mensagem:", err);
+    }
   };
 
   return (
