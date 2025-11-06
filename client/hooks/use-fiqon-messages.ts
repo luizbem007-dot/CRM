@@ -74,36 +74,74 @@ export default function useFiqonMessages(pollInterval = 0) {
       }, pollInterval);
     }
 
-    // Setup Supabase realtime subscription for INSERTs on table 'fiqon'
-    try {
-      const channel = supabase
-        .channel("public:fiqon")
-        .on(
-          "postgres_changes",
-          { event: "INSERT", schema: "public", table: "fiqon" },
-          (payload) => {
-            if (!mounted) return;
-            const newRow = payload.new;
-            const normalized = normalize(newRow);
-            setMessages((prev) => {
-              // avoid duplicates
-              if (prev.find((m) => String(m.id) === String(normalized.id))) return prev;
-              return [...prev, normalized];
-            });
-          },
-        )
-        .subscribe();
-      channelRef.current = channel;
-    } catch (err) {
-      console.warn("Realtime subscription failed:", err);
-    }
+    // Realtime subscription with exponential backoff reconnection
+    const backoffRef = { current: 1000 };
+    let retryTimer: any = null;
+
+    const subscribeRealtime = async () => {
+      // cleanup previous
+      try {
+        if (channelRef.current && typeof (channelRef.current as any).unsubscribe === "function") {
+          (channelRef.current as any).unsubscribe();
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      try {
+        const channel = supabase
+          .channel("public:fiqon")
+          .on(
+            "postgres_changes",
+            { event: "INSERT", schema: "public", table: "fiqon" },
+            (payload) => {
+              if (!mounted) return;
+              const newRow = payload.new;
+              console.log("🔴 Nova mensagem recebida via Realtime", newRow);
+              const normalized = normalize(newRow);
+              setMessages((prev) => {
+                if (prev.find((m) => String(m.id) === String(normalized.id))) return prev;
+                return [...prev, normalized];
+              });
+            },
+          )
+          .subscribe();
+
+        channelRef.current = channel;
+        backoffRef.current = 1000; // reset backoff on success
+      } catch (err) {
+        console.warn("Realtime subscription failed, retrying:", err);
+        // schedule retry with backoff
+        retryTimer = setTimeout(() => {
+          backoffRef.current = Math.min(backoffRef.current * 2, 30000);
+          subscribeRealtime();
+        }, backoffRef.current);
+      }
+    };
+
+    subscribeRealtime();
+
+    // Try to re-subscribe when browser comes back online or tab becomes visible
+    const onOnline = () => {
+      if (!mounted) return;
+      subscribeRealtime();
+    };
+    const onVisible = () => {
+      if (!mounted) return;
+      if (document.visibilityState === "visible") subscribeRealtime();
+    };
+    window.addEventListener("online", onOnline);
+    document.addEventListener("visibilitychange", onVisible);
 
     return () => {
       mounted = false;
       if (interval) clearInterval(interval);
+      if (retryTimer) clearTimeout(retryTimer);
+      window.removeEventListener("online", onOnline);
+      document.removeEventListener("visibilitychange", onVisible);
       abortRef.current?.abort();
       // unsubscribe
-      if (channelRef.current && typeof channelRef.current.unsubscribe === "function") {
+      if (channelRef.current && typeof (channelRef.current as any).unsubscribe === "function") {
         try {
           (channelRef.current as any).unsubscribe();
         } catch (e) {
