@@ -21,5 +21,13 @@ export function createServer() {
   app.get("/api/demo", handleDemo);
   app.post("/api/auth/login", handleLogin);
 
+  // Z-API webhook endpoint for incoming messages
+  try {
+    const { handleZapiWebhook } = await import("./routes/zapi");
+    app.post("/api/zapi/webhook", handleZapiWebhook);
+  } catch (e) {
+    console.warn("Z-API webhook route not registered:", e);
+  }
+
   return app;
 }
