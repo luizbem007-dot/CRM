@@ -84,6 +84,94 @@ export default function Dashboard() {
       })
     : [];
 
+  const [conversationMeta, setConversationMeta] = useState<any>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadMeta = async () => {
+      if (!selectedId) return setConversationMeta(null);
+      try {
+        const resp = await fetch(`/api/conversations/by-phone/${encodeURIComponent(selectedId)}`);
+        if (!resp.ok) return setConversationMeta(null);
+        const data = await resp.json();
+        if (!cancelled) setConversationMeta(data.data ?? null);
+      } catch (e) {
+        console.error('Could not load conversation meta', e);
+        setConversationMeta(null);
+      }
+    };
+    loadMeta();
+    return () => { cancelled = true; };
+  }, [selectedId]);
+
+  const toggleBot = async (enabled: boolean) => {
+    if (!conversationMeta?.id) return;
+    try {
+      await fetch(`/api/conversations/${conversationMeta.id}/bot`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled }) });
+      setConversationMeta((m: any) => ({ ...m, bot_enabled: enabled }));
+    } catch (e) { console.error(e); }
+  };
+
+  const assignConversation = async () => {
+    if (!conversationMeta?.id) return;
+    try {
+      const user = localStorage.getItem('userName') || 'Agente';
+      await fetch(`/api/conversations/${conversationMeta.id}/assign`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user }) });
+      setConversationMeta((m: any) => ({ ...m, assigned_to: user, assigned_at: new Date().toISOString() }));
+    } catch (e) { console.error(e); }
+  };
+
+  const releaseConversation = async () => {
+    if (!conversationMeta?.id) return;
+    try {
+      await fetch(`/api/conversations/${conversationMeta.id}/release`, { method: 'POST' });
+      setConversationMeta((m: any) => ({ ...m, assigned_to: null, assigned_at: null }));
+    } catch (e) { console.error(e); }
+  };
+
+  const saveContact = async () => {
+    if (!selectedId) return;
+    const name = window.prompt('Nome do contato');
+    if (!name) return;
+    const notes = window.prompt('Notas (opcional)') ?? '';
+    try {
+      const resp = await fetch('/api/contacts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: selectedId, name, notes }) });
+      if (!resp.ok) throw new Error('failed');
+      const data = await resp.json();
+      console.log('Contato salvo', data);
+      // refresh conversation meta
+      const metaResp = await fetch(`/api/conversations/by-phone/${encodeURIComponent(selectedId)}`);
+      const metaData = await metaResp.json();
+      setConversationMeta(metaData.data ?? null);
+    } catch (e) { console.error(e); }
+  };
+
+  const addNote = async () => {
+    if (!conversationMeta?.id) return alert('Selecione uma conversa');
+    const text = window.prompt('Nova nota interna');
+    if (!text) return;
+    try {
+      await fetch('/api/notes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conversation_id: conversationMeta.id, author: localStorage.getItem('userName') || 'Agente', text }) });
+      alert('Nota adicionada');
+    } catch (e) { console.error(e); alert('Erro adicionando nota'); }
+  };
+
+  const updateTags = async (tags: string[]) => {
+    if (!conversationMeta?.id) return;
+    try {
+      await fetch(`/api/conversations/${conversationMeta.id}/tags`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tags }) });
+      setConversationMeta((m: any) => ({ ...m, tags }));
+    } catch (e) { console.error(e); }
+  };
+
+  const setStatus = async (status: string) => {
+    if (!conversationMeta?.id) return;
+    try {
+      await fetch(`/api/conversations/${conversationMeta.id}/status`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+      setConversationMeta((m: any) => ({ ...m, status }));
+    } catch (e) { console.error(e); }
+  };
+
   const handleSend = async () => {
     if (!input.trim() || !selectedId) return;
 
