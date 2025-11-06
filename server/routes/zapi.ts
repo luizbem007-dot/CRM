@@ -35,7 +35,12 @@ export const handleZapiWebhook: RequestHandler = async (req, res) => {
     ]);
 
     if (insert.error) {
-      console.error("Error inserting webhook message into supabase:", insert.error);
+      try {
+        console.error("Error inserting webhook message into supabase:", JSON.stringify(insert.error, Object.getOwnPropertyNames(insert.error)));
+        console.error("Full insert response:", JSON.stringify(insert, null, 2));
+      } catch (e) {
+        console.error("Error inserting webhook message into supabase (non-serializable):", insert.error);
+      }
       return res.status(500).json({ ok: false, error: insert.error });
     }
 
