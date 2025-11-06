@@ -52,14 +52,48 @@ export default function ChatWindow({
         <div>
           <div className="font-medium text-white">{contactName}</div>
           <div className="text-xs text-text-secondary mt-0.5">{status || "online"}</div>
+          {conversation?.assigned_to && (
+            <div className="text-[11px] text-text-secondary mt-1">👤 {conversation.assigned_to} assumiu esta conversa</div>
+          )}
         </div>
-        {typeof onSend === "function" && (
-          <div>
+
+        <div className="flex items-center gap-2">
+          {/* Bot toggle */}
+          {typeof onToggleBot === 'function' && (
+            <button
+              onClick={() => onToggleBot(!conversation?.bot_enabled)}
+              className={"px-3 py-1 rounded-full text-sm " + (conversation?.bot_enabled ? 'bg-[#062e1f] text-[#00ff99]' : 'bg-[#1b1b1b] text-text-secondary')}
+            >
+              {conversation?.bot_enabled ? '🤖 Bot Ativo' : '🧍 Modo Manual'}
+            </button>
+          )}
+
+          {/* Assign / Release */}
+          {typeof onAssign === 'function' && typeof onRelease === 'function' && (
+            conversation?.assigned_to ? (
+              <button onClick={onRelease} className="px-3 py-1 rounded-md text-sm bg-gray-800">Liberar</button>
+            ) : (
+              <button onClick={onAssign} className="px-3 py-1 rounded-md text-sm btn-neon">Assumir</button>
+            )
+          )}
+
+          {/* Save contact */}
+          {typeof onSaveContact === 'function' && (
+            <button onClick={onSaveContact} className="px-2 py-1 rounded-md text-sm bg-background/30 border">💾 Salvar</button>
+          )}
+
+          {/* Notes */}
+          {typeof onAddNote === 'function' && (
+            <button onClick={onAddNote} className="px-2 py-1 rounded-md text-sm bg-background/30 border">🗒 Notas</button>
+          )}
+
+          {/* Send */}
+          {typeof onSend === "function" && (
             <Button size="sm" className="btn-neon" onClick={onSend}>
               <Send className="h-3 w-3" /> Enviar
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
