@@ -1,0 +1,47 @@
+import { RequestHandler } from "express";
+import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(SUPABASE_URL ?? "", SUPABASE_KEY ?? "");
+
+export const handleCreateMessage: RequestHandler = async (req, res) => {
+  try {
+    const {
+      client_message_id,
+      user_id,
+      phone,
+      message,
+      name,
+      source = "CRM",
+      fromMe = true,
+    } = req.body as any;
+
+    if (!message || !phone) {
+      return res.status(400).json({ ok: false, error: 'missing phone or message' });
+    }
+
+    const payload = {
+      client_message_id,
+      user_id,
+      phone,
+      message,
+      name: name ?? "Agente",
+      source,
+      fromMe,
+      created_at: new Date().toISOString(),
+    } as any;
+
+    const insert = await supabase.from("fiqon").insert([payload]);
+
+    if (insert.error) {
+      console.error("Server: error inserting message:", insert.error);
+      return res.status(500).json({ ok: false, error: insert.error });
+    }
+
+    return res.status(200).json({ ok: true, data: insert.data });
+  } catch (err: any) {
+    console.error("Server: exception creating message:", err);
+    return res.status(500).json({ ok: false, error: err?.message ?? String(err) });
+  }
+};
