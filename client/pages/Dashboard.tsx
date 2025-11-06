@@ -63,8 +63,8 @@ export default function Dashboard() {
 
   const activeContact = contacts.find((c) => c.id === selectedId)!;
 
-  // FIQON data source (poll every 2s)
-  const { messages: fiqonMessages } = useFiqonMessages(2000);
+  // FIQON data source (realtime via Supabase)
+  const { messages: fiqonMessages } = useFiqonMessages(0);
 
   const messagesByClient: Record<string, Message[]> = {};
   fiqonMessages.forEach((m) => {
