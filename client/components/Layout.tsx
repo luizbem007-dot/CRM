@@ -62,7 +62,7 @@ export default function Layout({
             <div className="h-9 w-9 flex items-center justify-center">
               <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2Fa33e52d5d58c411c9ab9b2443c5520b9?format=webp&width=800" alt="Funcionou.AI" className="h-8 w-8 object-contain" />
             </div>
-            <div className="text-lg font-bold tracking-tight">Central de Conversas</div>
+            <div className="text-lg font-bold tracking-tight">Funcionou.<span className="ml-1 text-[#00FF66]">AI</span></div>
           </div>
           <nav className="p-3 space-y-1">
             {tabs.map(({ key, label, icon: Icon }) => {
