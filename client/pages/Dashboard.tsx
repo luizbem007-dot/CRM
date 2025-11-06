@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Layout, { TabKey } from "@/components/Layout";
 import ChatWindow, { Message } from "@/components/Chat/ChatWindow";
+import SaveContactModal from "@/components/Chat/SaveContactModal";
 import ContactListItem from "@/components/Chat/ContactListItem";
 import { Button } from "@/components/ui/button";
 import { Paperclip, Smile, Send } from "lucide-react";
@@ -15,9 +16,11 @@ export default function Dashboard() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [input, setInput] = useState("");
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [lastOpenedPhone, setLastOpenedPhone] = useState<string | null>(null);
 
   // FIQON data source (realtime via Supabase)
-  const { messages: fiqonMessages, loading: fiqonLoading, appendLocalMessage } = useFiqonMessages(0);
+  const { messages: fiqonMessages, loading: fiqonLoading, appendLocalMessage, refetch: refetchFiqon } = useFiqonMessages(0);
   const [sending, setSending] = useState(false);
   const [responseZAPI, setResponseZAPI] = useState<any>(null);
 
@@ -104,6 +107,16 @@ export default function Dashboard() {
     return () => { cancelled = true; };
   }, [selectedId]);
 
+  useEffect(() => {
+    // If conversation meta has no name, open save modal once per phone
+    if (!conversationMeta) return;
+    const phone = selectedId;
+    if (phone && (!conversationMeta.name || conversationMeta.name === "") && lastOpenedPhone !== phone) {
+      setShowSaveModal(true);
+      setLastOpenedPhone(phone);
+    }
+  }, [conversationMeta, selectedId, lastOpenedPhone]);
+
   const toggleBot = async (enabled: boolean) => {
     if (!conversationMeta?.id) return;
     try {
@@ -131,19 +144,8 @@ export default function Dashboard() {
 
   const saveContact = async () => {
     if (!selectedId) return;
-    const name = window.prompt('Nome do contato');
-    if (!name) return;
-    const notes = window.prompt('Notas (opcional)') ?? '';
-    try {
-      const resp = await fetch('/api/contacts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: selectedId, name, notes }) });
-      if (!resp.ok) throw new Error('failed');
-      const data = await resp.json();
-      console.log('Contato salvo', data);
-      // refresh conversation meta
-      const metaResp = await fetch(`/api/conversations/by-phone/${encodeURIComponent(selectedId)}`);
-      const metaData = await metaResp.json();
-      setConversationMeta(metaData.data ?? null);
-    } catch (e) { console.error(e); }
+    // open modal to save contact instead of prompt
+    setShowSaveModal(true);
   };
 
   const addNote = async () => {
@@ -462,6 +464,27 @@ export default function Dashboard() {
           ))}
         </div>
       )}
+      <SaveContactModal
+        phone={selectedId ?? ""}
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        onSaved={async () => {
+          try {
+            if (typeof refetchFiqon === "function") await refetchFiqon();
+            if (selectedId) {
+              const resp = await fetch(`/api/conversations/by-phone/${encodeURIComponent(selectedId)}`);
+              if (resp.ok) {
+                const data = await resp.json();
+                setConversationMeta(data.data ?? null);
+              }
+            }
+          } catch (e) {
+            console.error("Error refreshing after save", e);
+          } finally {
+            setShowSaveModal(false);
+          }
+        }}
+      />
     </Layout>
   );
 }
