@@ -28,7 +28,6 @@ export const handleCreateMessage: RequestHandler = async (req, res) => {
       message,
       name: name ?? "Agente",
       source,
-      from_me: fromMe,
       created_at: new Date().toISOString(),
     } as any;
 
