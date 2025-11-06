@@ -465,35 +465,37 @@ export default function Dashboard() {
           ))}
         </div>
       )}
-      <React.Suspense fallback={null}>
-        <SaveContactModal
-          phone={selectedId ?? ""}
-          isOpen={showSaveModal}
-          onClose={() => setShowSaveModal(false)}
-          onSaved={async () => {
-            try {
-              if (typeof refetchFiqon === "function") await refetchFiqon();
-              if (selectedId) {
-                try {
-                  const resp = await fetch(`/api/conversations/by-phone/${encodeURIComponent(selectedId)}`);
-                  if (resp.ok) {
-                    const data = await resp.json();
-                    setConversationMeta(data.data ?? null);
-                  } else {
-                    console.warn('Could not refresh conversation meta after save, status', resp.status);
+      <ErrorBoundary>
+        <React.Suspense fallback={null}>
+          <SaveContactModal
+            phone={selectedId ?? ""}
+            isOpen={showSaveModal}
+            onClose={() => setShowSaveModal(false)}
+            onSaved={async () => {
+              try {
+                if (typeof refetchFiqon === "function") await refetchFiqon();
+                if (selectedId) {
+                  try {
+                    const resp = await fetch(`/api/conversations/by-phone/${encodeURIComponent(selectedId)}`);
+                    if (resp.ok) {
+                      const data = await resp.json();
+                      setConversationMeta(data.data ?? null);
+                    } else {
+                      console.warn('Could not refresh conversation meta after save, status', resp.status);
+                    }
+                  } catch (e) {
+                    console.warn('Could not fetch conversation meta after save', e);
                   }
-                } catch (e) {
-                  console.warn('Could not fetch conversation meta after save', e);
                 }
+              } catch (e) {
+                console.error("Error refreshing after save", e);
+              } finally {
+                setShowSaveModal(false);
               }
-            } catch (e) {
-              console.error("Error refreshing after save", e);
-            } finally {
-              setShowSaveModal(false);
-            }
-          }}
-        />
-      </React.Suspense>
+            }}
+          />
+        </React.Suspense>
+      </ErrorBoundary>
     </Layout>
   );
 }
