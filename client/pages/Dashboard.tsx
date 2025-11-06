@@ -120,7 +120,7 @@ export default function Dashboard() {
       });
 
       if (!res.ok) {
-        const txt = await res.text();
+        const txt = await res.clone().text();
         console.error("Z-API error:", res.status, txt);
         const { toast } = await import("sonner");
         if (res.status === 400 || res.status === 401) {
