@@ -4,7 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 function getSupabase() {
   const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
   const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ?? "";
-  if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error("SUPABASE_URL or SUPABASE_ANON_KEY not configured");
+  if (!SUPABASE_URL || !SUPABASE_KEY)
+    throw new Error("SUPABASE_URL or SUPABASE_ANON_KEY not configured");
   return createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
@@ -21,7 +22,9 @@ export const handleCreateMessage: RequestHandler = async (req, res) => {
     } = req.body as any;
 
     if (!message || !phone) {
-      return res.status(400).json({ ok: false, error: 'missing phone or message' });
+      return res
+        .status(400)
+        .json({ ok: false, error: "missing phone or message" });
     }
 
     const payload = {
@@ -45,6 +48,8 @@ export const handleCreateMessage: RequestHandler = async (req, res) => {
     return res.status(200).json({ ok: true, data: insert.data });
   } catch (err: any) {
     console.error("Server: exception creating message:", err);
-    return res.status(500).json({ ok: false, error: err?.message ?? String(err) });
+    return res
+      .status(500)
+      .json({ ok: false, error: err?.message ?? String(err) });
   }
 };

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Layout, { TabKey } from "@/components/Layout";
 import ChatWindow, { Message } from "@/components/Chat/ChatWindow";
-const SaveContactModal = React.lazy(() => import("@/components/Chat/SaveContactModal"));
+const SaveContactModal = React.lazy(
+  () => import("@/components/Chat/SaveContactModal"),
+);
 import ErrorBoundary from "@/components/ErrorBoundary";
 import ContactListItem from "@/components/Chat/ContactListItem";
 import { Button } from "@/components/ui/button";
@@ -21,52 +23,79 @@ export default function Dashboard() {
   const [lastOpenedPhone, setLastOpenedPhone] = useState<string | null>(null);
 
   // FIQON data source (realtime via Supabase)
-  const { messages: fiqonMessages, loading: fiqonLoading, appendLocalMessage, refetch: refetchFiqon } = useFiqonMessages(0);
+  const {
+    messages: fiqonMessages,
+    loading: fiqonLoading,
+    appendLocalMessage,
+    refetch: refetchFiqon,
+  } = useFiqonMessages(0);
   const [sending, setSending] = useState(false);
   const [responseZAPI, setResponseZAPI] = useState<any>(null);
 
   // Group messages by phone (preferred) or user_id or client_id
   const messagesByContact: Record<string, Message[]> = {};
   fiqonMessages.forEach((m) => {
-    const key = String(m.phone ?? m.user_id ?? m.client_id ?? m.id ?? "unknown");
+    const key = String(
+      m.phone ?? m.user_id ?? m.client_id ?? m.id ?? "unknown",
+    );
     if (!messagesByContact[key]) messagesByContact[key] = [];
-    const sender = (m.status || "").toLowerCase().includes("bot") || (m.message || "").startsWith("Bot:") ? "bot" : "user";
-    const time = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
-    messagesByContact[key].push({ id: String(m.id), sender: sender as any, text: m.message ?? "", time, ts: m.created_at } as any);
+    const sender =
+      (m.status || "").toLowerCase().includes("bot") ||
+      (m.message || "").startsWith("Bot:")
+        ? "bot"
+        : "user";
+    const time = m.created_at
+      ? new Date(m.created_at).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "";
+    messagesByContact[key].push({
+      id: String(m.id),
+      sender: sender as any,
+      text: m.message ?? "",
+      time,
+      ts: m.created_at,
+    } as any);
   });
 
   // Build conversations list from messagesByContact
-  const conversations = Object.keys(messagesByContact).map((contactKey) => {
-    const list = messagesByContact[contactKey].slice();
-    // sort messages by ts ascending
-    list.sort((a: any, b: any) => {
-      const ta = a.ts ? new Date(a.ts).getTime() : 0;
-      const tb = b.ts ? new Date(b.ts).getTime() : 0;
-      return ta - tb;
+  const conversations = Object.keys(messagesByContact)
+    .map((contactKey) => {
+      const list = messagesByContact[contactKey].slice();
+      // sort messages by ts ascending
+      list.sort((a: any, b: any) => {
+        const ta = a.ts ? new Date(a.ts).getTime() : 0;
+        const tb = b.ts ? new Date(b.ts).getTime() : 0;
+        return ta - tb;
+      });
+      const last = list[list.length - 1];
+
+      // find name from fiqonMessages for this contact
+      const meta = fiqonMessages.find(
+        (m) =>
+          String(m.phone ?? m.user_id ?? m.client_id ?? m.id) === contactKey,
+      );
+      const name = meta?.nome ?? `Cliente ${contactKey}`;
+      const lastTimestamp = last?.ts ?? meta?.created_at ?? null;
+
+      return {
+        id: contactKey,
+        name,
+        lastMessage: last?.text ?? "",
+        time: last?.time ?? "",
+        unread: 0,
+        status: last?.sender === "bot" ? "bot ativo" : "online",
+        lastTimestamp,
+        messages: list,
+      } as any;
+    })
+    .sort((a: any, b: any) => {
+      // sort by lastTimestamp desc
+      const ta = a.lastTimestamp ? new Date(a.lastTimestamp).getTime() : 0;
+      const tb = b.lastTimestamp ? new Date(b.lastTimestamp).getTime() : 0;
+      return tb - ta;
     });
-    const last = list[list.length - 1];
-
-    // find name from fiqonMessages for this contact
-    const meta = fiqonMessages.find((m) => String(m.phone ?? m.user_id ?? m.client_id ?? m.id) === contactKey);
-    const name = meta?.nome ?? `Cliente ${contactKey}`;
-    const lastTimestamp = last?.ts ?? meta?.created_at ?? null;
-
-    return {
-      id: contactKey,
-      name,
-      lastMessage: last?.text ?? "",
-      time: last?.time ?? "",
-      unread: 0,
-      status: last?.sender === "bot" ? "bot ativo" : "online",
-      lastTimestamp,
-      messages: list,
-    } as any;
-  }).sort((a: any, b: any) => {
-    // sort by lastTimestamp desc
-    const ta = a.lastTimestamp ? new Date(a.lastTimestamp).getTime() : 0;
-    const tb = b.lastTimestamp ? new Date(b.lastTimestamp).getTime() : 0;
-    return tb - ta;
-  });
 
   // Ensure selectedId defaults to first conversation
   useEffect(() => {
@@ -80,13 +109,14 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fiqonMessages]);
 
-  const displayMessages = (selectedId && messagesByContact[selectedId])
-    ? messagesByContact[selectedId].slice().sort((a: any, b: any) => {
-        const ta = a.ts ? new Date(a.ts).getTime() : 0;
-        const tb = b.ts ? new Date(b.ts).getTime() : 0;
-        return ta - tb;
-      })
-    : [];
+  const displayMessages =
+    selectedId && messagesByContact[selectedId]
+      ? messagesByContact[selectedId].slice().sort((a: any, b: any) => {
+          const ta = a.ts ? new Date(a.ts).getTime() : 0;
+          const tb = b.ts ? new Date(b.ts).getTime() : 0;
+          return ta - tb;
+        })
+      : [];
 
   const [conversationMeta, setConversationMeta] = useState<any>(null);
 
@@ -95,24 +125,32 @@ export default function Dashboard() {
     const loadMeta = async () => {
       if (!selectedId) return setConversationMeta(null);
       try {
-        const resp = await fetch(`/api/conversations/by-phone/${encodeURIComponent(selectedId)}`);
+        const resp = await fetch(
+          `/api/conversations/by-phone/${encodeURIComponent(selectedId)}`,
+        );
         if (!resp.ok) return setConversationMeta(null);
         const data = await resp.json();
         if (!cancelled) setConversationMeta(data.data ?? null);
       } catch (e) {
-        console.error('Could not load conversation meta', e);
+        console.error("Could not load conversation meta", e);
         setConversationMeta(null);
       }
     };
     loadMeta();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [selectedId]);
 
   useEffect(() => {
     // If conversation meta has no name, open save modal once per phone
     if (!conversationMeta) return;
     const phone = selectedId;
-    if (phone && (!conversationMeta.name || conversationMeta.name === "") && lastOpenedPhone !== phone) {
+    if (
+      phone &&
+      (!conversationMeta.name || conversationMeta.name === "") &&
+      lastOpenedPhone !== phone
+    ) {
       setShowSaveModal(true);
       setLastOpenedPhone(phone);
     }
@@ -121,26 +159,50 @@ export default function Dashboard() {
   const toggleBot = async (enabled: boolean) => {
     if (!conversationMeta?.id) return;
     try {
-      await fetch(`/api/conversations/${conversationMeta.id}/bot`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled }) });
+      await fetch(`/api/conversations/${conversationMeta.id}/bot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled }),
+      });
       setConversationMeta((m: any) => ({ ...m, bot_enabled: enabled }));
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const assignConversation = async () => {
     if (!conversationMeta?.id) return;
     try {
-      const user = localStorage.getItem('userName') || 'Agente';
-      await fetch(`/api/conversations/${conversationMeta.id}/assign`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user }) });
-      setConversationMeta((m: any) => ({ ...m, assigned_to: user, assigned_at: new Date().toISOString() }));
-    } catch (e) { console.error(e); }
+      const user = localStorage.getItem("userName") || "Agente";
+      await fetch(`/api/conversations/${conversationMeta.id}/assign`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user }),
+      });
+      setConversationMeta((m: any) => ({
+        ...m,
+        assigned_to: user,
+        assigned_at: new Date().toISOString(),
+      }));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const releaseConversation = async () => {
     if (!conversationMeta?.id) return;
     try {
-      await fetch(`/api/conversations/${conversationMeta.id}/release`, { method: 'POST' });
-      setConversationMeta((m: any) => ({ ...m, assigned_to: null, assigned_at: null }));
-    } catch (e) { console.error(e); }
+      await fetch(`/api/conversations/${conversationMeta.id}/release`, {
+        method: "POST",
+      });
+      setConversationMeta((m: any) => ({
+        ...m,
+        assigned_to: null,
+        assigned_at: null,
+      }));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const saveContact = async () => {
@@ -150,29 +212,52 @@ export default function Dashboard() {
   };
 
   const addNote = async () => {
-    if (!conversationMeta?.id) return alert('Selecione uma conversa');
-    const text = window.prompt('Nova nota interna');
+    if (!conversationMeta?.id) return alert("Selecione uma conversa");
+    const text = window.prompt("Nova nota interna");
     if (!text) return;
     try {
-      await fetch('/api/notes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conversation_id: conversationMeta.id, author: localStorage.getItem('userName') || 'Agente', text }) });
-      alert('Nota adicionada');
-    } catch (e) { console.error(e); alert('Erro adicionando nota'); }
+      await fetch("/api/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation_id: conversationMeta.id,
+          author: localStorage.getItem("userName") || "Agente",
+          text,
+        }),
+      });
+      alert("Nota adicionada");
+    } catch (e) {
+      console.error(e);
+      alert("Erro adicionando nota");
+    }
   };
 
   const updateTags = async (tags: string[]) => {
     if (!conversationMeta?.id) return;
     try {
-      await fetch(`/api/conversations/${conversationMeta.id}/tags`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tags }) });
+      await fetch(`/api/conversations/${conversationMeta.id}/tags`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tags }),
+      });
       setConversationMeta((m: any) => ({ ...m, tags }));
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const setStatus = async (status: string) => {
     if (!conversationMeta?.id) return;
     try {
-      await fetch(`/api/conversations/${conversationMeta.id}/status`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+      await fetch(`/api/conversations/${conversationMeta.id}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
       setConversationMeta((m: any) => ({ ...m, status }));
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleSend = async () => {
@@ -182,7 +267,8 @@ export default function Dashboard() {
     const text = input.trim();
 
     // Z-API endpoint
-    const ZAPI_URL = "https://api.z-api.io/instances/3E97080A6033712B38C3922F34499783/token/0B33D7C0F338A98F82743FEE/send-text";
+    const ZAPI_URL =
+      "https://api.z-api.io/instances/3E97080A6033712B38C3922F34499783/token/0B33D7C0F338A98F82743FEE/send-text";
 
     try {
       setSending(true);
@@ -210,10 +296,16 @@ export default function Dashboard() {
       // store for audit/logging/UI
       setResponseZAPI(zapiResult);
       if (!zapiResult.ok) {
-        console.warn("Z-API returned error, but will still record message locally and in Supabase", zapiResult.status, zapiResult.bodyText);
+        console.warn(
+          "Z-API returned error, but will still record message locally and in Supabase",
+          zapiResult.status,
+          zapiResult.bodyText,
+        );
         const { toast } = await import("sonner");
         if (zapiResult.status === 400 || zapiResult.status === 401) {
-          toast.error("❌ Erro ao enviar mensagem. Verifique se o número está correto e o WhatsApp está conectado.");
+          toast.error(
+            "❌ Erro ao enviar mensagem. Verifique se o número está correto e o WhatsApp está conectado.",
+          );
         } else if (zapiResult.status === 404) {
           toast.error("⚠️ O número informado não possui WhatsApp ativo.");
         } else {
@@ -225,21 +317,21 @@ export default function Dashboard() {
       // 2) If Z-API succeeded, insert into Supabase so Realtime picks it up
       // Use server endpoint to create the message in Supabase to avoid client-side supabase-js insert issues
       try {
-        const resp = await fetch('/api/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const resp = await fetch("/api/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             client_message_id,
             user_id: selectedId,
             phone,
             message: text,
-            name: localStorage.getItem('userName') || 'Agente',
-            source: 'CRM',
+            name: localStorage.getItem("userName") || "Agente",
+            source: "CRM",
             fromMe: true,
           }),
         });
 
-        let bodyText = '';
+        let bodyText = "";
         try {
           bodyText = await resp.text();
         } catch (e) {
@@ -247,16 +339,20 @@ export default function Dashboard() {
         }
 
         if (!resp.ok) {
-          console.error('Server /api/messages returned error', resp.status, bodyText);
-          const { toast } = await import('sonner');
-          toast.error('Erro ao enviar mensagem (server)');
+          console.error(
+            "Server /api/messages returned error",
+            resp.status,
+            bodyText,
+          );
+          const { toast } = await import("sonner");
+          toast.error("Erro ao enviar mensagem (server)");
           setSending(false);
           return;
         }
       } catch (e) {
-        console.error('Error calling /api/messages:', e);
-        const { toast } = await import('sonner');
-        toast.error('Erro ao enviar mensagem (server)');
+        console.error("Error calling /api/messages:", e);
+        const { toast } = await import("sonner");
+        toast.error("Erro ao enviar mensagem (server)");
         setSending(false);
         return;
       }
@@ -275,12 +371,20 @@ export default function Dashboard() {
   };
 
   return (
-    <Layout userName={userName} userRole={userRole} active={activeTab} onChange={setActiveTab}>
-      {activeTab === "conversas" && (
-        (conversations.length === 0) ? (
+    <Layout
+      userName={userName}
+      userRole={userRole}
+      active={activeTab}
+      onChange={setActiveTab}
+    >
+      {activeTab === "conversas" &&
+        (conversations.length === 0 ? (
           <div className="rounded-2xl border border-border/60 bg-background/60 p-8 text-center">
             <div className="text-lg font-medium">Nenhuma conversa ainda</div>
-            <div className="text-sm text-muted-foreground mt-2">As conversas aparecerão automaticamente quando novas mensagens forem recebidas.</div>
+            <div className="text-sm text-muted-foreground mt-2">
+              As conversas aparecerão automaticamente quando novas mensagens
+              forem recebidas.
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
@@ -288,7 +392,9 @@ export default function Dashboard() {
             <div className="lg:col-span-4 xl:col-span-3 rounded-2xl border border-border/60 bg-background/60 backdrop-blur p-3">
               <div className="flex items-center justify-between px-1 pb-2">
                 <div className="font-medium">Conversas</div>
-                <div className="text-xs text-muted-foreground">{conversations.length} contatos</div>
+                <div className="text-xs text-muted-foreground">
+                  {conversations.length} contatos
+                </div>
               </div>
               <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
                 {conversations.map((c) => (
@@ -309,8 +415,12 @@ export default function Dashboard() {
             {/* Chat */}
             <div className="lg:col-span-8 xl:col-span-9 rounded-2xl border border-border/60 bg-background/60 backdrop-blur flex flex-col h-[70vh]">
               <ChatWindow
-                contactName={(conversations.find((x) => x.id === selectedId)?.name) ?? "Selecione uma conversa"}
-                status={(conversations.find((x) => x.id === selectedId)?.status) ?? ""
+                contactName={
+                  conversations.find((x) => x.id === selectedId)?.name ??
+                  "Selecione uma conversa"
+                }
+                status={
+                  conversations.find((x) => x.id === selectedId)?.status ?? ""
                 }
                 messages={displayMessages}
                 onSend={handleSend}
@@ -327,7 +437,10 @@ export default function Dashboard() {
                 <button className="h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70">
                   <Paperclip className="h-4 w-4 m-auto" />
                 </button>
-                <button className="h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70" onClick={() => setInput((v) => v + " 🙂") }>
+                <button
+                  className="h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70"
+                  onClick={() => setInput((v) => v + " 🙂")}
+                >
                   <Smile className="h-4 w-4 m-auto" />
                 </button>
                 <input
@@ -337,14 +450,21 @@ export default function Dashboard() {
                   placeholder="Escreva uma mensagem..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSend();
+                  }}
                 />
-                <Button onClick={handleSend} disabled={sending} className="h-11 px-4"><Send className="h-4 w-4" /> Enviar</Button>
+                <Button
+                  onClick={handleSend}
+                  disabled={sending}
+                  className="h-11 px-4"
+                >
+                  <Send className="h-4 w-4" /> Enviar
+                </Button>
               </div>
             </div>
           </div>
-        )
-      )}
+        ))}
 
       {activeTab === "relatorios" && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -476,15 +596,23 @@ export default function Dashboard() {
                 if (typeof refetchFiqon === "function") await refetchFiqon();
                 if (selectedId) {
                   try {
-                    const resp = await fetch(`/api/conversations/by-phone/${encodeURIComponent(selectedId)}`);
+                    const resp = await fetch(
+                      `/api/conversations/by-phone/${encodeURIComponent(selectedId)}`,
+                    );
                     if (resp.ok) {
                       const data = await resp.json();
                       setConversationMeta(data.data ?? null);
                     } else {
-                      console.warn('Could not refresh conversation meta after save, status', resp.status);
+                      console.warn(
+                        "Could not refresh conversation meta after save, status",
+                        resp.status,
+                      );
                     }
                   } catch (e) {
-                    console.warn('Could not fetch conversation meta after save', e);
+                    console.warn(
+                      "Could not fetch conversation meta after save",
+                      e,
+                    );
                   }
                 }
               } catch (e) {
