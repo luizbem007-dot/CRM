@@ -102,7 +102,6 @@ export const handleGetOrCreateByPhone: RequestHandler = async (req, res) => {
     const q = await supabase.from('conversations').select('*').eq('phone', phone).limit(1);
     if (q.error) return res.status(500).json({ ok: false, error: q.error });
     if (q.data && q.data.length > 0) return res.json({ ok: true, data: q.data[0] });
-    const supabase = getSupabase();
     const ins = await supabase.from('conversations').insert({ phone, created_at: new Date().toISOString() }).select();
     if (ins.error) return res.status(500).json({ ok: false, error: ins.error });
     return res.json({ ok: true, data: ins.data[0] });
