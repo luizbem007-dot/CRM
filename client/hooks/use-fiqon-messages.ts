@@ -7,6 +7,10 @@ export interface FiqonMessage {
   client_id?: string;
   user_id?: string;
   phone?: string;
+  client_message_id?: string;
+  fromMe?: boolean;
+  sender?: string;
+  name?: string;
   nome?: string;
   message?: string;
   created_at?: string;
@@ -25,7 +29,11 @@ export default function useFiqonMessages(pollInterval = 0) {
     client_id: d.client_id ?? d.cliente_id ?? d.clientId ?? d.client ?? d.client_id,
     user_id: d.user_id ?? d.userId ?? d.userid ?? d.user ?? undefined,
     phone: d.phone ?? d.telefone ?? d.numero ?? d.msisdn ?? undefined,
-    nome: d.nome ?? d.name ?? d.nome_cliente ?? d.client_name,
+    client_message_id: d.client_message_id ?? d.client_msg_id ?? d.clientMessageId ?? undefined,
+    fromMe: d.fromMe === true || d.from_me === true || d.fromme === true || d.fromMe === "true" || false,
+    sender: d.sender ?? d.type ?? undefined,
+    name: d.name ?? d.nome ?? undefined,
+    nome: d.nome ?? d.name ?? undefined,
     message: d.message ?? d.mensagem ?? d.text ?? d.body,
     created_at: d.created_at ?? d.inserted_at ?? d.ts ?? d.created_at,
     status: d.status ?? d.st ?? d.state,
