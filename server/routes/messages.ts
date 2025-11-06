@@ -1,9 +1,12 @@
 import { RequestHandler } from "express";
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
-const supabase = createClient(SUPABASE_URL ?? "", SUPABASE_KEY ?? "");
+function getSupabase() {
+  const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
+  const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ?? "";
+  if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error("SUPABASE_URL or SUPABASE_ANON_KEY not configured");
+  return createClient(SUPABASE_URL, SUPABASE_KEY);
+}
 
 export const handleCreateMessage: RequestHandler = async (req, res) => {
   try {
@@ -31,6 +34,7 @@ export const handleCreateMessage: RequestHandler = async (req, res) => {
       created_at: new Date().toISOString(),
     } as any;
 
+    const supabase = getSupabase();
     const insert = await supabase.from("fiqon").insert([payload]);
 
     if (insert.error) {
