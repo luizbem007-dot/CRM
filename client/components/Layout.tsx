@@ -107,7 +107,7 @@ export default function Layout({
           <header className="h-16 sticky top-0 backdrop-blur bg-background/60 border-b border-border/60 flex items-center px-4 lg:px-6 gap-3 neon-glow">
             <div className="flex items-center gap-4">
               <div className="f-logo">
-                <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2F6dec44841bf641cc89eed145dcb1ffe6?format=webp&width=800" alt="Funcionou.AI" className="h-8 w-8 object-contain" />
+                <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2Ff4f6d8a8cede428fa0c26b651908a2f8?format=webp&width=800" alt="Funcionou.AI" className="h-8 w-8 object-contain" />
               </div>
               <div className="hidden sm:block">
                 <div className="text-lg font-bold">Funcionou.AI</div>
