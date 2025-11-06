@@ -128,7 +128,12 @@ export default function Dashboard() {
         const resp = await fetch(
           `/api/conversations/by-phone/${encodeURIComponent(selectedId)}`,
         );
-        if (!resp.ok) return setConversationMeta(null);
+        if (!resp.ok) {
+          let bodyText = '';
+          try { bodyText = await resp.text(); } catch (e) { bodyText = String(e); }
+          console.error('Could not load conversation meta: non-ok', resp.status, bodyText);
+          return setConversationMeta(null);
+        }
         const data = await resp.json();
         if (!cancelled) setConversationMeta(data.data ?? null);
       } catch (e) {
