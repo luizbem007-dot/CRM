@@ -79,65 +79,64 @@ export default function Dashboard() {
   return (
     <Layout userName={userName} userRole={userRole} active={activeTab} onChange={setActiveTab}>
       {activeTab === "conversas" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          {/* Contacts */}
-          <div className="lg:col-span-4 xl:col-span-3 rounded-2xl border border-border/60 bg-background/60 backdrop-blur p-3">
-            <div className="flex items-center justify-between px-1 pb-2">
-              <div className="font-medium">Conversas</div>
-              <div className="text-xs text-muted-foreground">
-                {contacts.length} contatos
+        (conversations.length === 0) ? (
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-8 text-center">
+            <div className="text-lg font-medium">Nenhuma conversa ainda</div>
+            <div className="text-sm text-muted-foreground mt-2">As conversas aparecerão automaticamente quando novas mensagens forem recebidas.</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            {/* Contacts */}
+            <div className="lg:col-span-4 xl:col-span-3 rounded-2xl border border-border/60 bg-background/60 backdrop-blur p-3">
+              <div className="flex items-center justify-between px-1 pb-2">
+                <div className="font-medium">Conversas</div>
+                <div className="text-xs text-muted-foreground">{conversations.length} contatos</div>
+              </div>
+              <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
+                {conversations.map((c) => (
+                  <ContactListItem
+                    key={c.id}
+                    name={c.name}
+                    lastMessage={c.lastMessage}
+                    time={c.time}
+                    status={c.status}
+                    unread={c.unread}
+                    active={selectedId === c.id}
+                    onClick={() => setSelectedId(c.id)}
+                  />
+                ))}
               </div>
             </div>
-            <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
-              {contacts.map((c) => (
-                <ContactListItem
-                  key={c.id}
-                  name={c.name}
-                  lastMessage={c.lastMessage}
-                  time={c.time}
-                  status={c.status}
-                  unread={c.unread}
-                  active={selectedId === c.id}
-                  onClick={() => setSelectedId(c.id)}
-                />
-              ))}
-            </div>
-          </div>
 
-          {/* Chat */}
-          <div className="lg:col-span-8 xl:col-span-9 rounded-2xl border border-border/60 bg-background/60 backdrop-blur flex flex-col h-[70vh]">
-            <ChatWindow
-              contactName={activeContact.name}
-              status={activeContact.status}
-              messages={displayMessages}
-            />
-            <div className="p-3 border-t border-border/60 flex items-center gap-2">
-              <button className="h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70">
-                <Paperclip className="h-4 w-4 m-auto" />
-              </button>
-              <button
-                className="h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70"
-                onClick={() => setInput((v) => v + " 🙂")}
-              >
-                <Smile className="h-4 w-4 m-auto" />
-              </button>
-              <input
-                className={cn(
-                  "flex-1 h-11 rounded-xl bg-background/60 border border-input px-3 outline-none text-sm focus:ring-2 focus:ring-ring focus:border-transparent",
-                )}
-                placeholder="Escreva uma mensagem..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSend();
-                }}
+            {/* Chat */}
+            <div className="lg:col-span-8 xl:col-span-9 rounded-2xl border border-border/60 bg-background/60 backdrop-blur flex flex-col h-[70vh]">
+              <ChatWindow
+                contactName={(conversations.find((x) => x.id === selectedId)?.name) ?? "Selecione uma conversa"}
+                status={(conversations.find((x) => x.id === selectedId)?.status) ?? ""
+                }
+                messages={displayMessages}
               />
-              <Button onClick={handleSend} className="h-11 px-4">
-                <Send className="h-4 w-4" /> Enviar
-              </Button>
+              <div className="p-3 border-t border-border/60 flex items-center gap-2">
+                <button className="h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70">
+                  <Paperclip className="h-4 w-4 m-auto" />
+                </button>
+                <button className="h-10 w-10 rounded-xl border border-input bg-background/60 hover:bg-sidebar-accent/70" onClick={() => setInput((v) => v + " 🙂") }>
+                  <Smile className="h-4 w-4 m-auto" />
+                </button>
+                <input
+                  className={cn(
+                    "flex-1 h-11 rounded-xl bg-background/60 border border-input px-3 outline-none text-sm focus:ring-2 focus:ring-ring focus:border-transparent",
+                  )}
+                  placeholder="Escreva uma mensagem..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
+                />
+                <Button onClick={handleSend} className="h-11 px-4"><Send className="h-4 w-4" /> Enviar</Button>
+              </div>
             </div>
           </div>
-        </div>
+        )
       )}
 
       {activeTab === "relatorios" && (
