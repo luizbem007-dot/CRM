@@ -2,9 +2,11 @@ import { RequestHandler } from "express";
 import { createClient } from "@supabase/supabase-js";
 
 function getSupabase() {
-  const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
-  const SUPABASE_SERVICE_ROLE =
-    process.env.SUPABASE_SERVICE_ROLE ?? process.env.SUPABASE_ANON_KEY ?? "";
+  // fallbacks to known dev values if env is not present (helps dev preview)
+  const FALLBACK_URL = "https://bwstynvthxuwaiyrgjoe.supabase.co";
+  const FALLBACK_SERVICE = process.env.SUPABASE_SERVICE_ROLE ?? process.env.SUPABASE_ANON_KEY ?? "";
+  const SUPABASE_URL = process.env.SUPABASE_URL ?? FALLBACK_URL;
+  const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE ?? process.env.SUPABASE_ANON_KEY ?? FALLBACK_SERVICE;
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE)
     throw new Error("SUPABASE_URL or SUPABASE_SERVICE_ROLE not configured");
   return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
