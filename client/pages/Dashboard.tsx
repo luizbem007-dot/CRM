@@ -129,9 +129,7 @@ export default function Dashboard() {
           `/api/conversations/by-phone/${encodeURIComponent(selectedId)}`,
         );
         if (!resp.ok) {
-          let bodyText = '';
-          try { bodyText = await resp.text(); } catch (e) { bodyText = String(e); }
-          console.error('Could not load conversation meta: non-ok', resp.status, bodyText);
+          console.error('Could not load conversation meta: non-ok', resp.status);
           return setConversationMeta(null);
         }
         const data = await resp.json();
