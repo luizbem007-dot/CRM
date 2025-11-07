@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import { createClient } from "@supabase/supabase-js";
+import mock from "../mockData";
 
 function getSupabase() {
   // fallbacks to known dev values if env is not present (helps dev preview)
