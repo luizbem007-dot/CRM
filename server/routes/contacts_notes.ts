@@ -109,7 +109,14 @@ export const handleGetNotes: RequestHandler = async (req, res) => {
       .select("*")
       .eq("conversation_id", conversation_id)
       .order("created_at", { ascending: false });
-    if (q.error) return res.status(500).json({ ok: false, error: q.error });
+    if (q.error) {
+      console.error('[notes] select error', q.error);
+      if ((q.error as any).code === 'PGRST205' || String((q.error as any).message).includes('Could not find the table')) {
+        console.warn('[notes] conversation_notes table missing; returning empty list');
+        return res.json({ ok: true, data: [] });
+      }
+      return res.status(500).json({ ok: false, error: q.error });
+    }
     return res.json({ ok: true, data: q.data });
   } catch (err: any) {
     console.error(err);
