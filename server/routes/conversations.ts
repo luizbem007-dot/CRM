@@ -134,7 +134,15 @@ export const handleGetConversations: RequestHandler = async (_req, res) => {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(200);
-    if (q.error) return res.status(500).json({ ok: false, error: q.error });
+    if (q.error) {
+      console.error('[conversations] getConversations supabase error', q.error);
+      if ((q.error as any).code === 'PGRST205' || String((q.error as any).message).includes('Could not find the table')) {
+        console.warn('[conversations] conversations table missing; returning empty list');
+        return res.json({ ok: true, data: [] });
+      }
+      return res.status(500).json({ ok: false, error: String(q.error) });
+    }
+
     return res.json({ ok: true, data: q.data });
   } catch (err: any) {
     console.error(err);
