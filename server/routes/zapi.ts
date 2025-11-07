@@ -39,42 +39,9 @@ export const handleZapiWebhook: RequestHandler = async (req, res) => {
         .json({ ok: false, reason: "missing phone or message" });
     }
 
-    const supabase = getSupabase();
-    const insert = await supabase.from("fiqon").insert([
-      {
-        // minimal fields that are used by the client
-        phone,
-        message,
-        name: name ?? "WhatsApp",
-        source: "Z-API-webhook",
-        created_at,
-      },
-    ]);
-
-    if (insert.error) {
-      try {
-        console.error(
-          "Error inserting webhook message into supabase:",
-          JSON.stringify(
-            insert.error,
-            Object.getOwnPropertyNames(insert.error),
-          ),
-        );
-        console.error("Full insert response:", JSON.stringify(insert, null, 2));
-      } catch (e) {
-        console.error(
-          "Error inserting webhook message into supabase (non-serializable):",
-          insert.error,
-        );
-      }
-      // If table missing in dev, accept the payload and return OK so webhook doesn't error
-      if ((insert.error as any).code === 'PGRST205' || String((insert.error as any).message).includes('Could not find the table')) {
-        console.warn('[zapi] fiqon table missing; accepting webhook payload in dev');
-        return res.status(200).json({ ok: true });
-      }
-      return res.status(500).json({ ok: false, error: insert.error });
-    }
-
+    // store into mock messages
+    const inserted = (await import("../mockData")).default.insertMessageMock({ phone, message, name: name ?? "WhatsApp", source: "Z-API-webhook", created_at });
+    console.log('[zapi] stored mock message', inserted);
     return res.status(200).json({ ok: true });
   } catch (err: any) {
     console.error("Error handling Z-API webhook:", err);
