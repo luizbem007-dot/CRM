@@ -163,6 +163,11 @@ export const handleGetOrCreateByPhone: RequestHandler = async (req, res) => {
 
     if (q.error) {
       console.error('[conversations] supabase select error', q.error);
+      // If table is missing (PGRST205), return a synthetic conversation to avoid 500 in dev
+      if ((q.error as any).code === 'PGRST205' || String((q.error as any).message).includes("Could not find the table")) {
+        console.warn('[conversations] Table missing in Supabase. Returning placeholder conversation. Run migrations to create tables.');
+        return res.json({ ok: true, data: { id: null, phone, name: `Cliente ${phone}`, bot_enabled: false, status: 'open', created_at: new Date().toISOString() } });
+      }
       return res.status(500).json({ ok: false, error: String(q.error) });
     }
 
@@ -178,7 +183,12 @@ export const handleGetOrCreateByPhone: RequestHandler = async (req, res) => {
       .select();
 
     if (ins.error) {
+      // If insert failed because table missing, return placeholder instead of 500
       console.error('[conversations] supabase insert error', ins.error);
+      if ((ins.error as any).code === 'PGRST205' || String((ins.error as any).message).includes("Could not find the table")) {
+        console.warn('[conversations] Table missing in Supabase during insert. Returning placeholder conversation.');
+        return res.json({ ok: true, data: { id: null, phone, name: `Cliente ${phone}`, bot_enabled: false, status: 'open', created_at: new Date().toISOString() } });
+      }
       return res.status(500).json({ ok: false, error: String(ins.error) });
     }
 
