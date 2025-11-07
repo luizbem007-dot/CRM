@@ -21,7 +21,7 @@ interface LayoutProps {
   userRole?: string;
   active: TabKey;
   onChange: (tab: TabKey) => void;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 const tabs: { key: TabKey; label: string; icon: any }[] = [
