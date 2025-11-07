@@ -39,20 +39,9 @@ export const handleCreateMessage: RequestHandler = async (req, res) => {
       created_at: new Date().toISOString(),
     } as any;
 
-    const supabase = getSupabase();
-    const insert = await supabase.from("fiqon").insert([payload]);
-
-    if (insert.error) {
-      console.error("Server: error inserting message:", insert.error);
-      // If table missing, return synthetic success so UI can continue in dev
-      if ((insert.error as any).code === 'PGRST205' || String((insert.error as any).message).includes('Could not find the table')) {
-        console.warn('Server: fiqon table missing; returning synthetic message payload');
-        return res.status(200).json({ ok: true, data: [payload] });
-      }
-      return res.status(500).json({ ok: false, error: insert.error });
-    }
-
-    return res.status(200).json({ ok: true, data: insert.data });
+    // Use mock storage
+    const inserted = (await import("../mockData")).default.insertMessageMock(payload);
+    return res.status(200).json({ ok: true, data: [inserted] });
   } catch (err: any) {
     console.error("Server: exception creating message:", err);
     return res
