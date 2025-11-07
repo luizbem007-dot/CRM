@@ -95,22 +95,8 @@ export const handleUpdateTags: RequestHandler = async (req, res) => {
 
 export const handleGetConversations: RequestHandler = async (_req, res) => {
   try {
-    const supabase = getSupabase();
-    const q = await supabase
-      .from("conversations")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(200);
-    if (q.error) {
-      console.error('[conversations] getConversations supabase error', q.error);
-      if ((q.error as any).code === 'PGRST205' || String((q.error as any).message).includes('Could not find the table')) {
-        console.warn('[conversations] conversations table missing; returning empty list');
-        return res.json({ ok: true, data: [] });
-      }
-      return res.status(500).json({ ok: false, error: String(q.error) });
-    }
-
-    return res.json({ ok: true, data: q.data });
+    const data = mock.getConversationsMock();
+    return res.json({ ok: true, data });
   } catch (err: any) {
     console.error(err);
     return res
@@ -128,47 +114,8 @@ export const handleGetOrCreateByPhone: RequestHandler = async (req, res) => {
       return res.status(400).json({ ok: false, error: "phone required" });
     }
 
-    const supabase = getSupabase();
-    console.log('[conversations] querying conversations for phone', phone);
-    const q = await supabase
-      .from("conversations")
-      .select("*")
-      .eq("phone", phone)
-      .limit(1);
-
-    if (q.error) {
-      console.error('[conversations] supabase select error', q.error);
-      // If table is missing (PGRST205), return a synthetic conversation to avoid 500 in dev
-      if ((q.error as any).code === 'PGRST205' || String((q.error as any).message).includes("Could not find the table")) {
-        console.warn('[conversations] Table missing in Supabase. Returning placeholder conversation. Run migrations to create tables.');
-        return res.json({ ok: true, data: { id: null, phone, name: `Cliente ${phone}`, bot_enabled: false, status: 'open', created_at: new Date().toISOString() } });
-      }
-      return res.status(500).json({ ok: false, error: String(q.error) });
-    }
-
-    if (q.data && q.data.length > 0) {
-      console.log('[conversations] found existing conversation for', phone);
-      return res.json({ ok: true, data: q.data[0] });
-    }
-
-    console.log('[conversations] no conversation found; inserting new for', phone);
-    const ins = await supabase
-      .from("conversations")
-      .insert({ phone, created_at: new Date().toISOString() })
-      .select();
-
-    if (ins.error) {
-      // If insert failed because table missing, return placeholder instead of 500
-      console.error('[conversations] supabase insert error', ins.error);
-      if ((ins.error as any).code === 'PGRST205' || String((ins.error as any).message).includes("Could not find the table")) {
-        console.warn('[conversations] Table missing in Supabase during insert. Returning placeholder conversation.');
-        return res.json({ ok: true, data: { id: null, phone, name: `Cliente ${phone}`, bot_enabled: false, status: 'open', created_at: new Date().toISOString() } });
-      }
-      return res.status(500).json({ ok: false, error: String(ins.error) });
-    }
-
-    console.log('[conversations] inserted conversation for', phone);
-    return res.json({ ok: true, data: ins.data[0] });
+    const conv = mock.getOrCreateConversationByPhoneMock(phone);
+    return res.json({ ok: true, data: conv });
   } catch (err: any) {
     console.error('[conversations] unhandled error', err);
     return res
