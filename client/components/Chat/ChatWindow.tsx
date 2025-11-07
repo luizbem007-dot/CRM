@@ -56,7 +56,7 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
       <div className="flex-1 overflow-y-auto px-4 py-6" style={{ paddingTop: 64, paddingBottom: 96 }} role="list" aria-label="Mensagens">
         <ul className="space-y-3">
           {localMessages.map((m) => (
-            <li key={m.id} role="listitem" className={m.sender === "agent" ? "flex justify-end" : "flex justify-start"}>
+            <li key={m.id} role="listitem" className={(m.sender === "agent" ? "flex justify-end" : "flex justify-start") + " message-fade"}>
               <div style={{ maxWidth: '75%' }}>
                 <div style={m.sender === "agent" ? { background: 'linear-gradient(90deg,#008A45,#00FF99)', color: '#00110a', padding: '10px', borderRadius: 18, boxShadow: '0 8px 24px rgba(0,255,102,0.08)' } : { background: '#1A1A1A', color: '#E6E6E6', padding: '10px', borderRadius: 18 }}>
                   <div>{m.text}</div>
