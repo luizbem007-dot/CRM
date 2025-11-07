@@ -68,21 +68,9 @@ export const handleSetStatus: RequestHandler = async (req, res) => {
     const { status } = req.body as { status?: string };
     if (!["open", "pending", "closed"].includes(status ?? ""))
       return res.status(400).json({ ok: false, error: "invalid status" });
-    const supabase = getSupabase();
-    const update = await supabase
-      .from("conversations")
-      .update({ status })
-      .eq("id", id)
-      .select();
-    if (update.error) {
-      console.error('[conversations] setStatus update error', update.error);
-      if ((update.error as any).code === 'PGRST205' || String((update.error as any).message).includes('Could not find the table')) {
-        console.warn('[conversations] conversations table missing; returning synthetic setStatus response');
-        return res.json({ ok: true, data: [{ id, status }] });
-      }
-      return res.status(500).json({ ok: false, error: update.error });
-    }
-    return res.json({ ok: true, data: update.data });
+
+    const updated = mock.updateConversationMock(id ?? null, { status });
+    return res.json({ ok: true, data: updated ? [updated] : [] });
   } catch (err: any) {
     console.error(err);
     return res
