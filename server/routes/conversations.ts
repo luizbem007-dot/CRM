@@ -83,21 +83,8 @@ export const handleUpdateTags: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const { tags } = req.body as { tags?: string[] };
-    const supabase = getSupabase();
-    const update = await supabase
-      .from("conversations")
-      .update({ tags })
-      .eq("id", id)
-      .select();
-    if (update.error) {
-      console.error('[conversations] updateTags error', update.error);
-      if ((update.error as any).code === 'PGRST205' || String((update.error as any).message).includes('Could not find the table')) {
-        console.warn('[conversations] conversations table missing; returning synthetic updateTags response');
-        return res.json({ ok: true, data: [{ id, tags }] });
-      }
-      return res.status(500).json({ ok: false, error: update.error });
-    }
-    return res.json({ ok: true, data: update.data });
+    const updated = mock.updateConversationMock(id ?? null, { tags });
+    return res.json({ ok: true, data: updated ? [updated] : [] });
   } catch (err: any) {
     console.error(err);
     return res
