@@ -97,21 +97,6 @@ export default function Dashboard() {
             <div className="lg:col-span-8 xl:col-span-9 rounded-2xl flex flex-col h-[70vh] overflow-hidden">
               <ChatWindow contactName={selectedConversation.name} status={selectedConversation.status} messages={displayMessages} />
 
-              <div className="p-3 border-t border-border/60 flex items-center gap-2 bg-transparent">
-                <input
-                  className="flex-1 h-11 rounded-xl bg-background/20 border border-input px-3 outline-none text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-[#00FF66] focus:border-transparent"
-                  placeholder="Digite uma mensagem..."
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      if (!input.trim()) return;
-                      setInput("");
-                    }
-                  }}
-                />
-              </div>
             </div>
           </div>
         </div>
