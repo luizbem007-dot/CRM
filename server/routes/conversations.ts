@@ -39,21 +39,8 @@ export const handleAssign: RequestHandler = async (req, res) => {
     if (!user)
       return res.status(400).json({ ok: false, error: "user is required" });
 
-    const supabase = getSupabase();
-    const update = await supabase
-      .from("conversations")
-      .update({ assigned_to: user, assigned_at: new Date().toISOString() })
-      .eq("id", id)
-      .select();
-    if (update.error) {
-      console.error('[conversations] assign update error', update.error);
-      if ((update.error as any).code === 'PGRST205' || String((update.error as any).message).includes('Could not find the table')) {
-        console.warn('[conversations] conversations table missing; returning synthetic assign response');
-        return res.json({ ok: true, data: [{ id, assigned_to: user, assigned_at: new Date().toISOString() }] });
-      }
-      return res.status(500).json({ ok: false, error: update.error });
-    }
-    return res.json({ ok: true, data: update.data });
+    const updated = mock.updateConversationMock(id ?? null, { assigned_to: user, assigned_at: new Date().toISOString() });
+    return res.json({ ok: true, data: updated ? [updated] : [] });
   } catch (err: any) {
     console.error(err);
     return res
