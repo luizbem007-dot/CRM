@@ -30,8 +30,6 @@ interface LayoutProps {
 
 const tabs: { key: TabKey; label: string; icon: any }[] = [
   { key: "conversas", label: "Conversas", icon: MessageSquare },
-  { key: "contatos", label: "Contatos", icon: Users },
-  { key: "relatorios", label: "Relatórios", icon: BarChart3 },
   { key: "configuracoes", label: "Configurações", icon: Settings },
   { key: "integracoes", label: "Integrações", icon: PlugZap },
 ];
