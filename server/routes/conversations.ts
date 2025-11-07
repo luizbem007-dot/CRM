@@ -147,25 +147,45 @@ export const handleGetConversations: RequestHandler = async (_req, res) => {
 export const handleGetOrCreateByPhone: RequestHandler = async (req, res) => {
   try {
     const phone = req.params.phone;
-    if (!phone)
+    console.log('[conversations] handleGetOrCreateByPhone called for phone:', phone);
+    if (!phone) {
+      console.warn('[conversations] phone param missing');
       return res.status(400).json({ ok: false, error: "phone required" });
+    }
+
     const supabase = getSupabase();
+    console.log('[conversations] querying conversations for phone', phone);
     const q = await supabase
       .from("conversations")
       .select("*")
       .eq("phone", phone)
       .limit(1);
-    if (q.error) return res.status(500).json({ ok: false, error: q.error });
-    if (q.data && q.data.length > 0)
+
+    if (q.error) {
+      console.error('[conversations] supabase select error', q.error);
+      return res.status(500).json({ ok: false, error: String(q.error) });
+    }
+
+    if (q.data && q.data.length > 0) {
+      console.log('[conversations] found existing conversation for', phone);
       return res.json({ ok: true, data: q.data[0] });
+    }
+
+    console.log('[conversations] no conversation found; inserting new for', phone);
     const ins = await supabase
       .from("conversations")
       .insert({ phone, created_at: new Date().toISOString() })
       .select();
-    if (ins.error) return res.status(500).json({ ok: false, error: ins.error });
+
+    if (ins.error) {
+      console.error('[conversations] supabase insert error', ins.error);
+      return res.status(500).json({ ok: false, error: String(ins.error) });
+    }
+
+    console.log('[conversations] inserted conversation for', phone);
     return res.json({ ok: true, data: ins.data[0] });
   } catch (err: any) {
-    console.error(err);
+    console.error('[conversations] unhandled error', err);
     return res
       .status(500)
       .json({ ok: false, error: err?.message ?? String(err) });
