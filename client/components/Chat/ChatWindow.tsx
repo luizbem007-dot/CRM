@@ -53,7 +53,7 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6" style={{ paddingTop: 64 }} role="list" aria-label="Mensagens">
+      <div className="flex-1 overflow-y-auto px-4 py-6" style={{ paddingTop: 64, paddingBottom: 96 }} role="list" aria-label="Mensagens">
         <ul className="space-y-3">
           {localMessages.map((m) => (
             <li key={m.id} role="listitem" className={m.sender === "agent" ? "flex justify-end" : "flex justify-start"}>
