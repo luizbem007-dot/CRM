@@ -67,21 +67,8 @@ export const handleGetNotes: RequestHandler = async (req, res) => {
       return res
         .status(400)
         .json({ ok: false, error: "conversation_id required" });
-    const supabase = getSupabase();
-    const q = await supabase
-      .from("conversation_notes")
-      .select("*")
-      .eq("conversation_id", conversation_id)
-      .order("created_at", { ascending: false });
-    if (q.error) {
-      console.error('[notes] select error', q.error);
-      if ((q.error as any).code === 'PGRST205' || String((q.error as any).message).includes('Could not find the table')) {
-        console.warn('[notes] conversation_notes table missing; returning empty list');
-        return res.json({ ok: true, data: [] });
-      }
-      return res.status(500).json({ ok: false, error: q.error });
-    }
-    return res.json({ ok: true, data: q.data });
+    const data = (await import("../mockData")).default.getNotesMock(conversation_id ?? null);
+    return res.json({ ok: true, data });
   } catch (err: any) {
     console.error(err);
     return res
