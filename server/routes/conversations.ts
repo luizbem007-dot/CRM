@@ -52,21 +52,8 @@ export const handleAssign: RequestHandler = async (req, res) => {
 export const handleRelease: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const supabase = getSupabase();
-    const update = await supabase
-      .from("conversations")
-      .update({ assigned_to: null, assigned_at: null })
-      .eq("id", id)
-      .select();
-    if (update.error) {
-      console.error('[conversations] release update error', update.error);
-      if ((update.error as any).code === 'PGRST205' || String((update.error as any).message).includes('Could not find the table')) {
-        console.warn('[conversations] conversations table missing; returning synthetic release response');
-        return res.json({ ok: true, data: [{ id, assigned_to: null, assigned_at: null }] });
-      }
-      return res.status(500).json({ ok: false, error: update.error });
-    }
-    return res.json({ ok: true, data: update.data });
+    const updated = mock.updateConversationMock(id ?? null, { assigned_to: null, assigned_at: null });
+    return res.json({ ok: true, data: updated ? [updated] : [] });
   } catch (err: any) {
     console.error(err);
     return res
