@@ -122,28 +122,34 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
 
       {/* Info side panel / modal */}
       {showInfo && (
-        <div className="fixed inset-0 z-40">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setShowInfo(false)} aria-hidden />
+        <div className="fixed inset-0 z-50 flex">
+          {/* Overlay */}
+          <div className="fixed inset-0 bg-black/60" onClick={() => setShowInfo(false)} aria-hidden />
 
-          <div className="absolute top-0 right-0 h-full flex items-start justify-end">
-            <div className="w-full md:w-[35%] lg:w-[35%] bg-[#0F0F0F] h-full rounded-l-2xl shadow-lg neon-glow m-0 border slide-in-right" style={{ borderColor: 'rgba(0,255,132,0.08)' }} onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--border-weak)' }}>
-                <div className="flex items-center gap-3">
-                  <div className="h-14 w-14 rounded-full bg-[linear-gradient(135deg,#00FF84,#008A45)] flex items-center justify-center font-semibold text-black text-lg">{contactName ? contactName[0] : "U"}</div>
-                  <div>
-                    <div className="font-semibold text-lg">{contactName}</div>
-                    <div className="text-sm text-[var(--text-secondary)]">{phone}</div>
-                  </div>
+          {/* Panel: fixed to right, responsive width */}
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed top-0 right-0 h-screen w-full md:w-[35%] lg:w-[35%] bg-[#0F0F0F] shadow-lg neon-glow border md:rounded-l-2xl rounded-t-2xl slide-in-right"
+            style={{ borderColor: 'rgba(0,255,132,0.08)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--border-weak)' }}>
+              <div className="flex items-center gap-3">
+                <div className="h-14 w-14 rounded-full bg-[linear-gradient(135deg,#00FF84,#008A45)] flex items-center justify-center font-semibold text-black text-lg">{contactName ? contactName[0] : "U"}</div>
+                <div>
+                  <div className="font-semibold text-lg">{contactName}</div>
+                  <div className="text-sm text-[var(--text-secondary)]">{phone}</div>
                 </div>
-                <button onClick={() => setShowInfo(false)} className="p-2 rounded-md hover:bg-[var(--hover-neon)]" aria-label="Fechar painel">
-                  <X className="h-5 w-5 text-[var(--text-secondary)]" />
-                </button>
               </div>
+              <button onClick={() => setShowInfo(false)} className="p-2 rounded-md hover:bg-[var(--hover-neon)]" aria-label="Fechar painel">
+                <X className="h-5 w-5 text-[var(--text-secondary)]" />
+              </button>
+            </div>
 
-              <div className="p-4">
-                <div className="h-px bg-[rgba(255,255,255,0.03)] mb-3" />
-                <div className="text-sm text-[var(--text-secondary)]">Salvo por: <span className="text-[var(--text-primary)] font-semibold">{savedBy}</span></div>
-              </div>
+            <div className="p-4">
+              <div className="h-px bg-[rgba(255,255,255,0.03)] mb-3" />
+              <div className="text-sm text-[var(--text-secondary)]">Salvo por: <span className="text-[var(--text-primary)] font-semibold">{savedBy}</span></div>
             </div>
           </div>
         </div>
