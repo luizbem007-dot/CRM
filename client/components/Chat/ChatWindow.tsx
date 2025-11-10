@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Paperclip, Smile, Send } from "lucide-react";
-import { motion } from "framer-motion";
 
 export interface Message {
   id: string;
@@ -66,7 +65,7 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
       <div className="flex-1 overflow-y-auto px-6 py-8" style={{ paddingTop: 86, paddingBottom: 112 }} role="list" aria-label="Mensagens">
         <ul className="space-y-4">
           {localMessages.map((m) => (
-            <motion.li layout key={m.id} role="listitem" className={(m.sender === "agent" ? "flex justify-end" : "flex justify-start") + " message-fade"}>
+            <li key={m.id} role="listitem" className={(m.sender === "agent" ? "flex justify-end" : "flex justify-start") + " message-fade"}>
               <div style={{ maxWidth: '72%' }}>
                 <div className={m.sender === "agent" ? "message-sent" : "message-recv"}>
                   <div>{m.text}</div>
@@ -75,7 +74,7 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
                   {m.time}
                 </div>
               </div>
-            </motion.li>
+            </li>
           ))}
           <div ref={bottomRef} />
         </ul>
