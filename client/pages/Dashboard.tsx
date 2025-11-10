@@ -89,11 +89,17 @@ export default function Dashboard() {
           </aside>
 
           {/* Chat area */}
-          <main className={"flex-1 rounded-2xl overflow-hidden chat-bg flex flex-col transition-all duration-300 " }>
-            <div className={conversationActive ? "flex-1 min-h-0 w-full max-w-4xl mx-auto" : "flex-1 min-h-0"}>
-              <ChatWindow onBack={() => setConversationActive(false)} isConversationMode={conversationActive} contactName={selectedConversation.name} status={selectedConversation.status} messages={displayMessages} />
-            </div>
-          </main>
+          {!activeChat ? (
+            <main className="flex-1 flex items-center justify-center">
+              <div className="text-[var(--text-secondary)]">Selecione uma conversa para começar</div>
+            </main>
+          ) : (
+            <main className={"flex-1 rounded-2xl overflow-hidden chat-bg flex flex-col transition-all duration-300 slide-in-right" }>
+              <div className="flex-1 min-h-0 w-full max-w-4xl mx-auto">
+                <ChatWindow onBack={() => setActiveChat(null)} isConversationMode={!!activeChat} contactName={selectedConversation?.name ?? ""} status={selectedConversation?.status} messages={displayMessages} />
+              </div>
+            </main>
+          )}
         </div>
       )}
 
