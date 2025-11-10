@@ -20,7 +20,7 @@ export default function Login() {
       localStorage.setItem("userName", "Luiz");
       localStorage.setItem("userRole", "Agente");
       setLoading(false);
-      navigate("/app");
+      navigate("/dashboard");
       return;
     }
 
