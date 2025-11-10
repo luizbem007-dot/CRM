@@ -58,7 +58,7 @@ export default function Dashboard() {
   return (
     <Layout userName={userName} userRole={userRole} active={activeTab as any} onChange={setActiveTab as any}>
       {activeTab === "conversas" && (
-        <div className={"flex h-[calc(100vh-96px)] gap-4 " + (conversationActive ? "justify-center items-start" : "")}>
+        <div className={"flex h-[calc(100vh-96px)] gap-4 " + (activeChat ? "justify-center items-start" : "")}>
           {/* Sidebar - conversations list */}
           <aside className={"w-[360px] rounded-2xl glass-panel p-3 overflow-hidden flex flex-col transition-transform duration-300 " + (conversationActive ? "hidden" : "block") }>
             <div className="flex items-center justify-between px-2 pb-3">
