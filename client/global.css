@@ -84,4 +84,8 @@
   /* side panel animations */
   .slide-in-right { animation: slide-in-right 320ms cubic-bezier(.2,.8,.2,1) forwards; transform: translateX(100%); }
   @keyframes slide-in-right { 0% { transform: translateX(100%); opacity: 0 } 60% { transform: translateX(6%); opacity: 1 } 100% { transform: translateX(0); opacity: 1 } }
+
+  /* sidebar slide for conversation mode */
+  .-translate-x-full { transform: translateX(-100%); }
+  .slide-left-in { transition: transform 260ms ease; }
 }
