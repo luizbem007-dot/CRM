@@ -48,15 +48,11 @@ export default function Dashboard() {
   const userRole = localStorage.getItem("userRole") || "";
   const [activeTab, setActiveTab] = useState<TabKey>("conversas");
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [input, setInput] = useState("");
-  const [conversationActive, setConversationActive] = useState(false);
+  // activeChat stores the id of the selected conversation or null
+  const [activeChat, setActiveChat] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!selectedId) setSelectedId(mockConversations[0].id);
-  }, [selectedId]);
-
-  const selectedConversation = mockConversations.find((c) => c.id === selectedId) ?? mockConversations[0];
+  const selectedConversation = activeChat ? (mockConversations.find((c) => c.id === activeChat) ?? null) : null;
   const displayMessages = selectedConversation ? selectedConversation.messages : [];
 
   return (
