@@ -13,7 +13,7 @@ const mockConversations = [
     time: "08:35",
     status: "online",
     messages: [
-      { id: "m1", sender: "agent", text: "E aí, tudo certo por aí?", time: "08:35" },
+      { id: "m1", sender: "agent", text: "E a��, tudo certo por aí?", time: "08:35" },
       { id: "m2", sender: "user", text: "Tudo sim! Obrigado.", time: "08:36" },
       { id: "m3", sender: "agent", text: "Ótimo, vamos em frente.", time: "08:37" },
     ] as Message[],
@@ -60,7 +60,7 @@ export default function Dashboard() {
       {activeTab === "conversas" && (
         <div className={"flex h-[calc(100vh-96px)] gap-4 " + (activeChat ? "justify-center items-start" : "")}>
           {/* Sidebar - conversations list */}
-          <aside className={"w-[360px] rounded-2xl glass-panel p-3 overflow-hidden flex flex-col transition-transform duration-300 " + (conversationActive ? "hidden" : "block") }>
+          <aside className={"w-[360px] rounded-2xl glass-panel p-3 overflow-hidden flex flex-col transition-transform duration-300 " + (activeChat ? "hidden lg:block" : "block") }>
             <div className="flex items-center justify-between px-2 pb-3">
               <div>
                 <div className="text-xl font-semibold">Conversas</div>
