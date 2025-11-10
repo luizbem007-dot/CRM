@@ -50,6 +50,7 @@ export default function Dashboard() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [input, setInput] = useState("");
+  const [conversationActive, setConversationActive] = useState(false);
 
   useEffect(() => {
     if (!selectedId) setSelectedId(mockConversations[0].id);
