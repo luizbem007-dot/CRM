@@ -62,9 +62,9 @@ export default function Dashboard() {
   return (
     <Layout userName={userName} userRole={userRole} active={activeTab as any} onChange={setActiveTab as any}>
       {activeTab === "conversas" && (
-        <div className="flex h-[calc(100vh-96px)] gap-4">
+        <div className={"flex h-[calc(100vh-96px)] gap-4 " + (conversationActive ? "justify-center items-start" : "")}>
           {/* Sidebar - conversations list */}
-          <aside className={"w-[360px] rounded-2xl glass-panel p-3 overflow-hidden flex flex-col transition-transform duration-300 " + (conversationActive ? "-translate-x-full lg:translate-x-0 lg:hidden" : "translate-x-0")}>
+          <aside className={"w-[360px] rounded-2xl glass-panel p-3 overflow-hidden flex flex-col transition-transform duration-300 " + (conversationActive ? "hidden" : "block") }>
             <div className="flex items-center justify-between px-2 pb-3">
               <div>
                 <div className="text-xl font-semibold">Conversas</div>
@@ -93,8 +93,8 @@ export default function Dashboard() {
           </aside>
 
           {/* Chat area */}
-          <main className={"flex-1 rounded-2xl overflow-hidden chat-bg flex flex-col transition-all duration-300 " + (conversationActive ? "w-full" : "w-full")}>
-            <div className="flex-1 min-h-0">
+          <main className={"flex-1 rounded-2xl overflow-hidden chat-bg flex flex-col transition-all duration-300 " }>
+            <div className={conversationActive ? "flex-1 min-h-0 w-full max-w-4xl mx-auto" : "flex-1 min-h-0"}>
               <ChatWindow onBack={() => setConversationActive(false)} isConversationMode={conversationActive} contactName={selectedConversation.name} status={selectedConversation.status} messages={displayMessages} />
             </div>
           </main>
