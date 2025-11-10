@@ -23,6 +23,8 @@ function generatePhone(name?: string) {
   return `+55 27 9${n.slice(0,4)}-${n.slice(4)}`;
 }
 
+import { createPortal } from 'react-dom';
+
 export default function ChatWindow({ messages, contactName, status }: ChatWindowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [localMessages, setLocalMessages] = useState<Message[]>(messages);
