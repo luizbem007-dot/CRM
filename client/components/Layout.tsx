@@ -55,7 +55,7 @@ export default function Layout({
         <aside className="sidebar-desktop hidden lg:flex w-[360px] shrink-0 h-screen sticky top-0 flex-col glass-panel" aria-label="Sidebar">
           <div className="h-20 flex items-center gap-3 px-6 border-b" style={{ borderColor: 'var(--border-weak)' }}>
             <div className="h-10 w-10 flex items-center justify-center rounded-md f-logo bg-transparent" aria-hidden>
-              <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2Fa33e52d5d58c411c9ab9b2443c5520b9?format=webp&width=800" alt="Funcionou.AI" className="h-8 w-8 object-contain rounded-md" />
+              <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2F62bee75c9cf54f7db5c6005f17af3083?format=webp&width=800" alt="Funcionou.AI" className="h-8 w-8 object-contain rounded-md" />
             </div>
             <div className="text-lg font-semibold tracking-tight">Funcionou.<span className="ml-1 neon">AI</span></div>
             <div className="ml-auto flex items-center gap-3 text-[13px]">
@@ -116,7 +116,7 @@ export default function Layout({
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-9 flex items-center justify-center">
-                    <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2Fa33e52d5d58c411c9ab9b2443c5520b9?format=webp&width=800" alt="Funcionou.AI" className="h-8 w-8 object-contain" />
+                    <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2F62bee75c9cf54f7db5c6005f17af3083?format=webp&width=800" alt="Funcionou.AI" className="h-8 w-8 object-contain" />
                   </div>
                   <div className="text-lg font-semibold tracking-tight">Funcionou.<span className="ml-1 neon">AI</span></div>
                 </div>
@@ -142,13 +142,15 @@ export default function Layout({
                 </button>
               </div>
 
-              <div className="f-logo" aria-hidden>
-                <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea0c26b651908a2f8?format=webp&width=800" alt="Funcionou.AI" className="h-8 w-8 object-contain rounded-md" />
-              </div>
-              <div className="hidden sm:block">
-                <div className="text-lg font-semibold">Central de Conversas</div>
-                <div className="text-[11px] text-[var(--text-secondary)]">Painel</div>
-              </div>
+              <div className="flex items-center gap-3">
+            <div className="h-10 w-10 flex items-center justify-center">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2Fc7a665936108422ea7c0c4c7a1027698%2F62bee75c9cf54f7db5c6005f17af3083?format=webp&width=800" alt="Funcionou.AI" className="h-10 w-10 object-contain rounded-md shadow-neon" />
+            </div>
+            <div className="hidden sm:block">
+              <div className="text-lg font-semibold tracking-tight">Funcionou.<span className="ml-1 neon">AI</span></div>
+              <div className="text-[11px] text-[var(--text-secondary)]">Central de Conversas</div>
+            </div>
+          </div>
             </div>
 
             <div className="flex items-center gap-2 rounded-xl bg-func-bg/60 border px-3 h-10 flex-1 max-w-xl" style={{ borderColor: 'var(--border-weak)' }} role="search" aria-label="Busca rápida">
