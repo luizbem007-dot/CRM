@@ -81,8 +81,8 @@ export default function Dashboard() {
                   lastMessage={c.lastMessage}
                   time={c.time}
                   status={c.status}
-                  active={selectedId === c.id}
-                  onClick={() => { setSelectedId(c.id); setConversationActive(true); }}
+                  active={activeChat === c.id}
+                  onClick={() => { setActiveChat(c.id); }}
                 />
               ))}
             </div>
