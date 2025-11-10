@@ -1,182 +1,79 @@
 /** @import must precede all other statements */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  /**
-   * Tailwind CSS theme
-   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
-   * A different format will require also updating the theme in tailwind.config.ts.
-  */
   :root {
-    /* Funcionou.AI theme */
-    --black-base: #0A0A0A;
-    --panel-base: #101010;
-    --neon-green: #00FF66;
-    --neon-green-dark: #008A45;
-    --neon-green-light: #66FF99;
-    --text-primary: #FFFFFF;
-    --text-secondary: #B3B3B3;
-    --border-glow: rgba(0, 255, 102, 0.3);
+    /* Funcionou.AI theme adapted to WhatsApp-like layout */
+    --bg: #0D0D0D; /* background */
+    --panel: #0D0D0D;
+    --neon-green: #00FF84;
+    --text-primary: #EAEAEA;
+    --text-secondary: #A1A1A1;
+    --hover-neon: rgba(0,255,132,0.15);
+    --border-weak: rgba(255,255,255,0.05);
 
-    /* derived HSL for existing Tailwind variables to avoid breaking other styles */
-    --background: 156 6% 3%; /* approx */
-    --foreground: 0 0% 100%;
-    --card: 0 0% 6%;
-    --card-foreground: 0 0% 100%;
-    --primary: 146 100% 50%; /* green hue placeholder */
-    --primary-foreground: 0 0% 6%;
-
-    --border: 0 0% 20%;
-    --input: 0 0% 14%;
-    --ring: 146 100% 50%;
-
-    --radius: 0.75rem;
+    --radius-lg: 16px;
   }
 
-  /* Neon utilities */
-  .bg-neon-gradient {
-    background: linear-gradient(180deg, var(--black-base) 0%, var(--neon-green-dark) 100%);
+  /* layout helpers */
+  .bg-func-bg { background: var(--bg); }
+
+  .glass-panel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border: 1px solid var(--border-weak);
+    backdrop-filter: blur(6px);
   }
 
-  .glow-neon {
-    box-shadow: 0 0 20px rgba(0,255,102,0.2);
+  .neon { color: var(--neon-green); text-shadow: 0 0 8px rgba(0,255,132,0.12); }
+
+  .neon-border { border: 1px solid rgba(0,255,132,0.06); }
+
+  .neon-glow { box-shadow: 0 6px 22px rgba(0,255,132,0.06); }
+
+  .chat-bg {
+    background: linear-gradient(135deg, rgba(13,13,13,1) 0%, rgba(0,255,132,0.03) 100%);
   }
 
-  .neon-border {
-    border: 1px solid rgba(0,255,102,0.12);
-  }
-
-  .neon-glow-outline {
-    box-shadow: 0 0 10px var(--border-glow);
-  }
-
-  .btn-neon {
-    background: linear-gradient(180deg, var(--neon-green) 0%, var(--neon-green-dark) 100%);
+  .message-sent {
+    background: linear-gradient(90deg, rgba(0,255,132,0.12), rgba(0,255,132,0.06));
     color: var(--text-primary);
-    transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
-    box-shadow: 0 6px 20px rgba(0,255,102,0.08);
-  }
-  .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,255,102,0.18); }
-
-  .bubble-sent {
-    background: linear-gradient(90deg, var(--neon-green) 0%, var(--neon-green-dark) 100%);
-    color: var(--text-primary);
-    border-radius: 18px;
-    box-shadow: 0 6px 20px rgba(0,255,102,0.08);
+    border-radius: var(--radius-lg);
+    padding: 10px 12px;
   }
 
-  .bubble-recv {
-    background: #1C1C1C;
+  .message-recv {
+    background: rgba(255,255,255,0.02);
     color: var(--text-primary);
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
+    padding: 10px 12px;
   }
 
   .chat-input {
-    background: rgba(16,16,16,0.6);
-    border: 1px solid rgba(0,255,102,0.12);
-    color: var(--neon-green-light);
-    transition: box-shadow 0.25s ease-in-out, border-color 0.25s ease-in-out;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(0,255,132,0.08);
+    color: var(--text-primary);
   }
 
-  .status-online {
-    color: var(--neon-green);
-    text-shadow: 0 0 8px rgba(0,255,102,0.15);
-    animation: pulse 2s infinite ease-in-out;
-  }
+  .neon-placeholder::placeholder { color: rgba(234,234,234,0.35); }
 
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: 0.9 }
-    50% { transform: scale(1.02); opacity: 1 }
-    100% { transform: scale(1); opacity: 0.9 }
-  }
-
-  .f-logo {
-    width: 36px; height: 36px; border-radius: 8px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; color:var(--black-base); background: transparent; box-shadow: none; padding: 0;
-    }
-
-  .watermark {
-    position: fixed; right: 12px; bottom: 8px; color: rgba(255,255,255,0.06); font-size: 12px; pointer-events: none;
-  }
-
-  .send-bounce {
-    transition: transform 0.25s cubic-bezier(.2,.8,.2,1);
-  }
-  .send-bounce.sending { transform: translateY(-6px); }
-
-  .message-fade { animation: fadeIn 0.3s ease-in-out; }
-  @keyframes fadeIn { from { opacity:0; transform: translateY(6px) } to { opacity:1; transform: translateY(0) } }
-
-  .chat-panel { background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(0,138,69,0.06)); }
-
-  .neon-placeholder::placeholder { color: rgba(102,255,153,0.35); }
-
-  .panel-border-neon { border: 1px solid rgba(0,255,102,0.06); }
-
-  /* Responsive three-column layout helper */
-  .three-col { display: grid; grid-template-columns: 320px 1fr 320px; gap: 16px; }
-  @media (max-width: 1024px) { .three-col { grid-template-columns: 1fr; } }
-
-  .dark {
-    --background: 156 20% 5%;
-    --foreground: 210 40% 98%;
-
-    --card: 156 18% 7%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 156 18% 7%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 83 100% 72%;
-    --primary-foreground: 156 20% 5%;
-
-    --secondary: 253 100% 81%;
-    --secondary-foreground: 156 20% 5%;
-
-    --muted: 160 10% 12%;
-    --muted-foreground: 160 8% 64%;
-
-    --accent: 253 100% 81%;
-    --accent-foreground: 156 20% 5%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 160 10% 18%;
-    --input: 160 10% 18%;
-    --ring: 83 100% 72%;
-    --sidebar-background: 156 20% 5%;
-    --sidebar-foreground: 210 40% 96%;
-    --sidebar-primary: 83 100% 72%;
-    --sidebar-primary-foreground: 156 20% 5%;
-    --sidebar-accent: 160 10% 12%;
-    --sidebar-accent-foreground: 210 40% 96%;
-    --sidebar-border: 160 10% 18%;
-    --sidebar-ring: 83 100% 72%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+  @media (max-width: 1024px) {
+    .sidebar-desktop { display: none; }
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Poppins', Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    @apply bg-func-bg text-[var(--text-primary)];
+    font-family: 'Inter', 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
+}
 
-  :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
-    overflow-wrap: anywhere;
-    word-break: break-word;
+@layer components {
+  .contact-card {
+    border-radius: var(--radius-lg);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
   }
-
-  pre,
-  code {
-    overflow-x: auto;
-    white-space: pre;
-  }
+  .contact-card:hover { background: var(--hover-neon); transform: translateY(-2px); }
 }

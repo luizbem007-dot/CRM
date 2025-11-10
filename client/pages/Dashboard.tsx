@@ -61,58 +61,56 @@ export default function Dashboard() {
   return (
     <Layout userName={userName} userRole={userRole} active={activeTab as any} onChange={setActiveTab as any}>
       {activeTab === "conversas" && (
-        <div>
-          <div className="mb-4 rounded-2xl border border-border/60 bg-background/60 p-4 flex items-center gap-4">
-            <div>
-              <div className="text-lg font-bold">Central de Conversas</div>
-              <div className="text-sm text-text-secondary">Painel</div>
-            </div>
-            <div className="flex-1">
-              <input aria-label="Busca de conversas" placeholder="Busca rápida" className="w-full h-11 rounded-xl bg-background/20 border border-input px-3 outline-none text-sm neon-placeholder" />
-            </div>
-            <div className="text-sm text-text-secondary">{mockConversations.length} contatos</div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            <div className="lg:col-span-4 xl:col-span-3 rounded-2xl p-3">
-              <div className="flex items-center justify-between px-1 pb-2">
-                <div className="font-medium">Conversas</div>
-                <div className="text-xs text-muted-foreground">3 contatos</div>
+        <div className="flex h-[calc(100vh-96px)] gap-4">
+          {/* Sidebar - conversations list */}
+          <aside className="w-[360px] rounded-2xl glass-panel p-3 overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-2 pb-3">
+              <div>
+                <div className="text-xl font-semibold">Conversas</div>
+                <div className="text-sm text-[var(--text-secondary)]">{mockConversations.length} contatos</div>
               </div>
-              <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
-                {mockConversations.map((c) => (
-                  <ContactListItem
-                    key={c.id}
-                    name={c.name}
-                    lastMessage={c.lastMessage}
-                    time={c.time}
-                    status={c.status}
-                    active={selectedId === c.id}
-                    onClick={() => setSelectedId(c.id)}
-                  />
-                ))}
-              </div>
+              <div className="text-sm text-[var(--text-secondary)]"> </div>
             </div>
 
-            <div className="lg:col-span-8 xl:col-span-9 rounded-2xl flex flex-col h-[70vh] overflow-hidden">
+            <div className="mt-2 mb-3">
+              <input aria-label="Busca de conversas" placeholder="Busca rápida" className="w-full h-11 rounded-xl bg-transparent border border-[var(--border-weak)] px-3 outline-none text-sm text-[var(--text-primary)] neon-placeholder" />
+            </div>
+
+            <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+              {mockConversations.map((c) => (
+                <ContactListItem
+                  key={c.id}
+                  name={c.name}
+                  lastMessage={c.lastMessage}
+                  time={c.time}
+                  status={c.status}
+                  active={selectedId === c.id}
+                  onClick={() => setSelectedId(c.id)}
+                />
+              ))}
+            </div>
+          </aside>
+
+          {/* Chat area */}
+          <main className="flex-1 rounded-2xl overflow-hidden chat-bg flex flex-col">
+            <div className="flex-1 min-h-0">
               <ChatWindow contactName={selectedConversation.name} status={selectedConversation.status} messages={displayMessages} />
-
             </div>
-          </div>
+          </main>
         </div>
       )}
 
       {activeTab === "configuracoes" && (
-        <div className="rounded-2xl border border-border/60 bg-background/60 p-8 text-center">
+        <div className="rounded-2xl border border-[var(--border-weak)] bg-transparent p-8 text-center">
           <div className="text-lg font-medium">Configurações</div>
-          <div className="text-sm text-muted-foreground mt-2">Em desenvolvimento</div>
+          <div className="text-sm text-[var(--text-secondary)] mt-2">Em desenvolvimento</div>
         </div>
       )}
 
       {activeTab === "integracoes" && (
-        <div className="rounded-2xl border border-border/60 bg-background/60 p-8 text-center">
+        <div className="rounded-2xl border border-[var(--border-weak)] bg-transparent p-8 text-center">
           <div className="text-lg font-medium">Integrações</div>
-          <div className="text-sm text-muted-foreground mt-2">Em desenvolvimento</div>
+          <div className="text-sm text-[var(--text-secondary)] mt-2">Em desenvolvimento</div>
         </div>
       )}
     </Layout>
