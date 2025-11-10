@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Paperclip, Smile, Send } from "lucide-react";
+import { ArrowLeft, Paperclip, Smile, Send, X } from "lucide-react";
 
 export interface Message {
   id: string;
@@ -14,10 +14,20 @@ interface ChatWindowProps {
   status?: string;
 }
 
+function generatePhone(name?: string) {
+  if (!name) return "+55 27 99255-1404";
+  // deterministic pseudo-phone based on name
+  let sum = 0;
+  for (let i = 0; i < name.length; i++) sum += name.charCodeAt(i);
+  const n = String(10000000 + (sum % 90000000)).padStart(8, "0");
+  return `+55 27 9${n.slice(0,4)}-${n.slice(4)}`;
+}
+
 export default function ChatWindow({ messages, contactName, status }: ChatWindowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [localMessages, setLocalMessages] = useState<Message[]>(messages);
   const [input, setInput] = useState("");
+  const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
     setLocalMessages(messages);
@@ -37,6 +47,9 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
     setInput("");
   };
 
+  const phone = generatePhone(contactName);
+  const savedBy = localStorage.getItem("userName") || "Usuário";
+
   return (
     <div className="flex flex-col h-full bg-transparent relative">
       {/* Header overlay */}
@@ -45,10 +58,12 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
           <button className="md:hidden p-2 rounded-md bg-transparent focus:outline-none" aria-label="Voltar">
             <ArrowLeft className="h-5 w-5 text-[var(--text-secondary)]" />
           </button>
+
           <div className="h-10 w-10 rounded-full bg-[linear-gradient(135deg,#00FF84,#008A45)] flex items-center justify-center font-semibold text-black">{contactName ? contactName[0] : "U"}</div>
-          <div>
+
+          <div className="cursor-pointer" onClick={() => setShowInfo(true)} role="button" aria-label={`Abrir informações de ${contactName}`}>
             <div className="font-semibold text-[var(--text-primary)]">{contactName}</div>
-            <div className="text-xs text-[var(--text-secondary)]">{status || "online"}</div>
+            <div className="text-xs text-[var(--text-secondary)]">{status || "online"} • <span className="text-[var(--neon-green)]">{phone}</span></div>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -104,6 +119,33 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
           </button>
         </div>
       </div>
+
+      {/* Info side panel / modal */}
+      {showInfo && (
+        <div className="fixed inset-0 z-40 flex items-center justify-end md:justify-end">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowInfo(false)} aria-hidden />
+
+          <div className="relative w-full max-w-md md:max-w-xs lg:max-w-sm bg-[#0F0F0F] rounded-2xl shadow-lg neon-glow m-4 border" style={{ borderColor: 'rgba(0,255,132,0.08)' }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--border-weak)' }}>
+              <div className="flex items-center gap-3">
+                <div className="h-14 w-14 rounded-full bg-[linear-gradient(135deg,#00FF84,#008A45)] flex items-center justify-center font-semibold text-black text-lg">{contactName ? contactName[0] : "U"}</div>
+                <div>
+                  <div className="font-semibold text-lg">{contactName}</div>
+                  <div className="text-sm text-[var(--text-secondary)]">{phone}</div>
+                </div>
+              </div>
+              <button onClick={() => setShowInfo(false)} className="p-2 rounded-md hover:bg-[var(--hover-neon)]" aria-label="Fechar painel">
+                <X className="h-5 w-5 text-[var(--text-secondary)]" />
+              </button>
+            </div>
+
+            <div className="p-4">
+              <div className="h-px bg-[rgba(255,255,255,0.03)] mb-3" />
+              <div className="text-sm text-[var(--text-secondary)]">Salvo por: <span className="text-[var(--text-primary)] font-semibold">{savedBy}</span></div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
