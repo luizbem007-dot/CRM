@@ -59,9 +59,15 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
       {/* Header overlay */}
       <div className="absolute top-0 left-0 right-0 h-20 z-10 bg-func-bg/60 backdrop-blur-md flex items-center justify-between px-6 py-3 border-b" style={{ borderColor: 'var(--border-weak)' }}>
         <div className="flex items-center gap-4">
-          <button className="md:hidden p-2 rounded-md bg-transparent focus:outline-none" aria-label="Voltar">
-            <ArrowLeft className="h-5 w-5 text-[var(--text-secondary)]" />
-          </button>
+          {isConversationMode ? (
+            <button onClick={() => onBack && onBack()} className="p-2 rounded-md bg-transparent focus:outline-none" aria-label="Voltar">
+              <ArrowLeft className="h-5 w-5 text-[var(--text-secondary)]" />
+            </button>
+          ) : (
+            <button className="md:hidden p-2 rounded-md bg-transparent focus:outline-none" aria-label="Voltar">
+              <ArrowLeft className="h-5 w-5 text-[var(--text-secondary)]" />
+            </button>
+          )}
 
           <div className="h-10 w-10 rounded-full bg-[linear-gradient(135deg,#00FF84,#008A45)] flex items-center justify-center font-semibold text-black">{contactName ? contactName[0] : "U"}</div>
 
