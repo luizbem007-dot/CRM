@@ -63,7 +63,7 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
 
           <div className="cursor-pointer" onClick={() => setShowInfo(true)} role="button" aria-label={`Abrir informações de ${contactName}`}>
             <div className="font-semibold text-[var(--text-primary)]">{contactName}</div>
-            <div className="text-xs text-[var(--text-secondary)]">{status || "online"} • <span className="text-[var(--neon-green)]">{phone}</span></div>
+            <div className="text-xs text-[var(--text-secondary)]"><span className="text-[var(--neon-green)]">{phone}</span></div>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -122,26 +122,28 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
 
       {/* Info side panel / modal */}
       {showInfo && (
-        <div className="fixed inset-0 z-40 flex items-center justify-end md:justify-end">
+        <div className="fixed inset-0 z-40">
           <div className="absolute inset-0 bg-black/60" onClick={() => setShowInfo(false)} aria-hidden />
 
-          <div className="relative w-full max-w-md md:max-w-xs lg:max-w-sm bg-[#0F0F0F] rounded-2xl shadow-lg neon-glow m-4 border" style={{ borderColor: 'rgba(0,255,132,0.08)' }} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--border-weak)' }}>
-              <div className="flex items-center gap-3">
-                <div className="h-14 w-14 rounded-full bg-[linear-gradient(135deg,#00FF84,#008A45)] flex items-center justify-center font-semibold text-black text-lg">{contactName ? contactName[0] : "U"}</div>
-                <div>
-                  <div className="font-semibold text-lg">{contactName}</div>
-                  <div className="text-sm text-[var(--text-secondary)]">{phone}</div>
+          <div className="absolute top-0 right-0 h-full flex items-start justify-end">
+            <div className="w-full md:w-[35%] lg:w-[35%] bg-[#0F0F0F] h-full rounded-l-2xl shadow-lg neon-glow m-0 border slide-in-right" style={{ borderColor: 'rgba(0,255,132,0.08)' }} onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--border-weak)' }}>
+                <div className="flex items-center gap-3">
+                  <div className="h-14 w-14 rounded-full bg-[linear-gradient(135deg,#00FF84,#008A45)] flex items-center justify-center font-semibold text-black text-lg">{contactName ? contactName[0] : "U"}</div>
+                  <div>
+                    <div className="font-semibold text-lg">{contactName}</div>
+                    <div className="text-sm text-[var(--text-secondary)]">{phone}</div>
+                  </div>
                 </div>
+                <button onClick={() => setShowInfo(false)} className="p-2 rounded-md hover:bg-[var(--hover-neon)]" aria-label="Fechar painel">
+                  <X className="h-5 w-5 text-[var(--text-secondary)]" />
+                </button>
               </div>
-              <button onClick={() => setShowInfo(false)} className="p-2 rounded-md hover:bg-[var(--hover-neon)]" aria-label="Fechar painel">
-                <X className="h-5 w-5 text-[var(--text-secondary)]" />
-              </button>
-            </div>
 
-            <div className="p-4">
-              <div className="h-px bg-[rgba(255,255,255,0.03)] mb-3" />
-              <div className="text-sm text-[var(--text-secondary)]">Salvo por: <span className="text-[var(--text-primary)] font-semibold">{savedBy}</span></div>
+              <div className="p-4">
+                <div className="h-px bg-[rgba(255,255,255,0.03)] mb-3" />
+                <div className="text-sm text-[var(--text-secondary)]">Salvo por: <span className="text-[var(--text-primary)] font-semibold">{savedBy}</span></div>
+              </div>
             </div>
           </div>
         </div>
