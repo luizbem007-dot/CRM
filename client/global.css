@@ -80,4 +80,8 @@
     transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
   }
   .contact-card:hover { background: var(--hover-neon); transform: translateY(-2px); }
+
+  /* side panel animations */
+  .slide-in-right { animation: slide-in-right 320ms cubic-bezier(.2,.8,.2,1) forwards; }
+  @keyframes slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
 }
