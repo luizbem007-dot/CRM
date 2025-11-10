@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 
 interface Props {
   name: string;
@@ -21,13 +20,11 @@ export default function ContactListItem({
   onClick,
 }: Props) {
   return (
-    <motion.button
+    <button
       onClick={onClick}
       title={`${name}: ${lastMessage}`}
       aria-label={`${name}, ${status ?? "offline"}, última mensagem: ${lastMessage}`}
-      whileHover={{ translateY: -4 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-      className={cn(
+            className={cn(
         "w-full text-left px-3 py-3 rounded-[16px] border transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 contact-card",
         active
           ? "bg-[rgba(0,255,132,0.06)] border-[var(--border-weak)]"
@@ -50,6 +47,6 @@ export default function ContactListItem({
           <span className="ml-2 text-[12px] px-2 py-0.5 rounded-full bg-[rgba(0,255,132,0.08)] text-[var(--neon-green)] shadow-[0_0_12px_rgba(0,255,132,0.08)]">{unread}</span>
         ) : null}
       </div>
-    </motion.button>
+    </button>
   );
 }
