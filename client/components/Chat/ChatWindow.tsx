@@ -27,7 +27,7 @@ function generatePhone(name?: string) {
 
 import { createPortal } from 'react-dom';
 
-export default function ChatWindow({ messages, contactName, status }: ChatWindowProps) {
+export default function ChatWindow({ messages, contactName, status, onBack, isConversationMode }: ChatWindowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [localMessages, setLocalMessages] = useState<Message[]>(messages);
   const [input, setInput] = useState("");
