@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Paperclip, Smile, Send, X } from "lucide-react";
 
 export interface Message {
