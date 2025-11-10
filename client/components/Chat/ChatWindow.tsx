@@ -12,6 +12,8 @@ interface ChatWindowProps {
   messages: Message[];
   contactName: string;
   status?: string;
+  onBack?: () => void;
+  isConversationMode?: boolean;
 }
 
 function generatePhone(name?: string) {
