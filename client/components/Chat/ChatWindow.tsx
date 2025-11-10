@@ -123,8 +123,8 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
       </div>
 
       {/* Info side panel / modal */}
-      {showInfo && (
-        <div className="fixed inset-0 z-50 flex">
+      {showInfo && typeof document !== 'undefined' ? createPortal(
+        <div className="fixed inset-0 z-50">
           {/* Overlay */}
           <div className="fixed inset-0 bg-black/60" onClick={() => setShowInfo(false)} aria-hidden />
 
@@ -154,8 +154,9 @@ export default function ChatWindow({ messages, contactName, status }: ChatWindow
               <div className="text-sm text-[var(--text-secondary)]">Salvo por: <span className="text-[var(--text-primary)] font-semibold">{savedBy}</span></div>
             </div>
           </div>
-        </div>
-      )}
+        </div>,
+        document.body
+      ) : null}
     </div>
   );
 }
